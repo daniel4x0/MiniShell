@@ -72,9 +72,9 @@ char *find_path(t_mini *mini, char **env)
 	while(base && base[++i])
 	{
 		temp = ft_strjoin(base[i], "/");
-		if (!lstat(ft_strjoin(temp, mini->str), &buff))
+		if (!lstat(ft_strjoin(temp, mini->toks[0]), &buff))
 		{
-			temp = ft_strjoin(temp, mini->str);
+			temp = ft_strjoin(temp, mini->toks[0]);
 			return(temp);
 		}
 		free(temp);
@@ -93,9 +93,7 @@ char *find_path(t_mini *mini, char **env)
 	pid_t	pid;
 
 	path = find_path(mini, env);
-	str = malloc(sizeof (char) * 2);
-	str[0] = ft_strdup(mini->str);
-	str[1] = NULL;
+	str = mini->cmds->args;
 	pid = fork();
 	if (pid == -1)
 	{

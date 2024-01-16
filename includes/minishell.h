@@ -76,5 +76,6 @@ t_mini *initialize_mini(char **envp);
 void handle_redirection(t_mini *mini, t_cmds *current_cmd);
 int	get_env(char **envp, t_mini *mini);
 char *find_path(t_mini *mini, char **env);
+t_cmds *initialize_cmds();
 
 #endif

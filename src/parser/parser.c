@@ -18,14 +18,14 @@ t_parse *initialize_parser()
 
 t_cmds *initialize_cmds() 
 {
-    t_cmds *cmds = (t_cmds *)malloc(sizeof(t_cmds));
+    t_cmds *cmds = (t_cmds *)malloc(sizeof(t_cmds) * 100000);
     if (cmds == NULL) 
     {
         exit(EXIT_FAILURE);
     }
 
-    cmds->cmd = NULL;
-    cmds->args = NULL;
+    cmds->cmd = (char *)malloc(sizeof(char *) * 1000);
+    cmds->args = (char **)malloc(sizeof(char **) * 1000);
     cmds->redirect = (t_redirect *)malloc(sizeof(t_redirect));
     if (cmds->redirect == NULL) 
     {
@@ -50,7 +50,7 @@ int open_next_file(const char *filename)
     {
         fprintf(stderr, "Error: Missing input file after '<'\n");
         exit(EXIT_FAILURE);
-    } else if (strcmp(filename, ">") == 0) 
+    } else if (strcmp(filename, ">") == 0)
     {
         fprintf(stderr, "Error: Missing output file after '>'\n");
         exit(EXIT_FAILURE);
@@ -106,20 +106,6 @@ int count_redirection_toks(t_mini *mini, t_parse *parser)
     return count;
 }
 
-
-/*void initialize_cmds(t_cmds *cmds, int args_count, int redirect_count) 
-{
-    cmds->cmd = NULL;
-
-    cmds->args = malloc((args_count + 1) * sizeof(char *));
-    cmds->args[args_count] = NULL;
-
-    cmds->redirect = malloc(sizeof(t_redirect) * redirect_count);
-
-    cmds->fdi = 0;
-    cmds->fdo = 1;
-    cmds->next = NULL;
-}*/
 
 int handle_redirection_1(t_cmds *cmds, char **toks, t_parse *parser, int i) 
 {
@@ -180,9 +166,8 @@ void	handle_last_command(t_mini *mini, t_parse *parser, t_cmds *cmds)
     initialize_cmds();
 	if (cmds->cmd == NULL)
 	{
-        printf("%s\n", mini->toks[0]);
 		cmds->cmd = ft_strdup(mini->toks[parser->toks]);
-		cmds->args[parser->p_args] = ft_strdup(mini->toks[parser->toks]);
+		cmds->args[0] = ft_strdup(mini->toks[parser->toks]);
 		parser->toks++;
 	}
 	else
@@ -199,7 +184,6 @@ void	handle_last_command(t_mini *mini, t_parse *parser, t_cmds *cmds)
 	cmds->args[parser->p_args] = NULL;
 }
 
-// Function to create a new command in the linked list of commands
 t_cmds *create_new_command() 
 {
     t_cmds *new_cmd = malloc(sizeof(t_cmds));
@@ -212,14 +196,6 @@ t_cmds *create_new_command()
 
     return new_cmd;
 }
-
-/*void initialize_lex(t_lexer *lex) {
-    lex->toks_count = 0;
-    lex->args = 0;
-    lex->redirect = 0;
-
-}*/
-
 
 int parse_input(t_mini *mini) 
 {
@@ -259,56 +235,5 @@ int parse_input(t_mini *mini)
         i++;
     }
 
-    return 0;
+    return 1;
 }
-
-/*int	parse_input(t_mini *mini)
-{
-	t_parse	parser;
-	t_cmds		*cmds;
-	t_cmds		*head;
-
-	initialize_parser();
-	cmds = ft_calloc(sizeof(t_cmds), 1);
-	head = cmds;
-	initialize_cmds();
-	while (mini->toks[parser.toks])
-	{
-		if (ft_strncmp(mini->toks[parser.toks], "|", 1) == 0)
-		{
-			if (mini->toks[parser.toks + 1] == NULL)
-				return (-1);
-			mini->cmds_count++;
-			parser.p_args = 0;
-			cmds->next = ft_calloc(sizeof(t_cmds), 1);
-			cmds = cmds->next;
-			parser.red++;
-			initialize_cmds();
-			parser.toks++;
-		}
-		else if (!ft_strncmp(mini->toks[parser.toks], ">>", 2))
-		{
-			if (handle_redirection_1(cmds, mini->toks, &parser, 2) == -1)
-				return (-1);
-		}
-		else if (!ft_strncmp(mini->toks[parser.toks], ">", 1))
-		{
-			if (handle_redirection_1(cmds, mini->toks, &parser, 1) == -1)
-				return (-1);
-		}
-		else if (!ft_strncmp(mini->toks[parser.toks], "<<", 2))
-		{
-			if (handle_redirection_2(cmds, mini->toks, &parser, 4) == -1)
-				return (-1);
-		}
-		else if (!ft_strncmp(mini->toks[parser.toks], "<", 1))
-		{
-			if (handle_redirection_2(cmds, mini->toks, &parser, 3) == -1)
-				return (-1);
-		}
-		else
-			handle_last_command(mini, &parser, cmds);
-	}
-	mini->cmds = head;
-	return (1);
-}*/

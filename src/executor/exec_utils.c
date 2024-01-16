@@ -38,7 +38,7 @@ int find_binary_path(t_mini *mini, t_cmds *cmds)
     return -1;
 }
 
-char *add_path_to_command(t_mini *mini, t_cmds *cmds, int index) 
+char *add_path_to_command(t_mini *mini, t_cmds *cmds, int index)  
 {
     char *path = mini->env[index] + 5;
     char *full_path = malloc(strlen(path) + strlen(cmds->cmd) + 2);
@@ -48,39 +48,24 @@ char *add_path_to_command(t_mini *mini, t_cmds *cmds, int index)
     }
     sprintf(full_path, "%s/%s", path, cmds->cmd);
     return full_path;
-}
+} 
 
 // Function to execute a command using execve after checking whether it's a built-in command or an external binary
 void execute(t_mini *mini, t_cmds *cmds) 
 {
-    if (strcmp(cmds->cmd, "cd") == 0) 
+    int index = find_binary_path(mini, cmds);
+    if (index != -1)
     {
-        // Handle cd as a built-in command
-        if (cmds->args[1] != NULL) 
-        {
-            if (chdir(cmds->args[1]) == -1) 
-            {
-                perror("cd");
-            }
-        }
-    } else if (strcmp(cmds->cmd, "exit") == 0) 
+        //char *full_path = add_path_to_command(mini, cmds, index);
+        char *full_path = find_path(mini, mini->env);
+        execve(full_path, cmds->args, mini->env);
+        perror("execve");
+        free(full_path);
+    }
+    else 
     {
-        // Handle exit as a built-in command
-        exit(EXIT_SUCCESS);
-    } else 
-    {
-        int index = find_binary_path(mini, cmds);
-        if (index != -1) 
-        {
-            char *full_path = add_path_to_command(mini, cmds, index);
-            execve(full_path, cmds->args, mini->env);
-            perror("execve");
-            free(full_path);
-        } else 
-        {
-            fprintf(stderr, "Error: Command not found\n");
-            exit(EXIT_FAILURE);
-        }
+        fprintf(stderr, "Error: Command not found\n");
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -110,24 +95,30 @@ void handle_here_document(t_mini *mini, const char *delimiter)
 // Function to handle input (<) and output (>, >>) redirection
 void handle_redirection(t_mini *mini, t_cmds *current_cmd) 
 {
-    if (current_cmd->redirect->infile != NULL) {
+    if (current_cmd->redirect->infile != NULL) 
+    {
         mini->fdin = open(current_cmd->redirect->infile, O_RDONLY);
-        if (mini->fdin == -1) {
+        if (mini->fdin == -1)
+        {
             perror("open");
             exit(EXIT_FAILURE);
         }
     }
 
-    if (current_cmd->redirect->outfile != NULL) {
+    if (current_cmd->redirect->outfile != NULL) 
+    {
         int flags;
-        if (current_cmd->redirect->redirect_type == 1) {
+        if (current_cmd->redirect->redirect_type == 1) 
+        {
             flags = O_WRONLY | O_CREAT | O_TRUNC;
-        } else {
+        } else 
+        {
             flags = O_WRONLY | O_CREAT | O_APPEND;
         }
 
         mini->fdout = open(current_cmd->redirect->outfile, flags, 0666);
-        if (mini->fdout == -1) {
+        if (mini->fdout == -1) 
+        {
             perror("open");
             exit(EXIT_FAILURE);
         }
@@ -164,14 +155,17 @@ void close_file_descriptors(t_mini *mini)
 // Function to execute multiple commands in a pipeline
 void execute_pipeline(t_mini *mini) 
 {
-    t_cmds *cmd = mini->cmds;
+    t_cmds *cmd = initialize_cmds();
     int saved_stdin = dup(STDIN_FILENO);
     int saved_stdout = dup(STDOUT_FILENO);
     int pipe_fd[2];
 
-    while (cmd) {
-        if (cmd->next) {
-            if (pipe(pipe_fd) == -1) {
+    while (cmd) 
+    {
+        if (cmd->next) 
+        {
+            if (pipe(pipe_fd) == -1) 
+            {
                 perror("pipe");
                 exit(EXIT_FAILURE);
             }
@@ -181,16 +175,23 @@ void execute_pipeline(t_mini *mini)
 
         pid_t pid = fork();
 
-        if (pid == -1) {
+        if (pid == -1) 
+        {
             perror("fork");
             exit(EXIT_FAILURE);
-        } else if (pid == 0) {
+        } 
+        else if (pid == 0) 
+        {
+            printf("fanculo\n");
             close_file_descriptors(mini);
             update_file_descriptors(mini, cmd);
             execute(mini, cmd);
-        } else {
+        } 
+        else 
+        {
             close(cmd->fdo);
-            if (!cmd->next) {
+            if (!cmd->next) 
+            {
                 close(cmd->fdi);
             }
             waitpid(pid, NULL, 0);
@@ -209,11 +210,9 @@ void execute_pipeline(t_mini *mini)
 // Main execution function
 void execute_commands(t_mini *mini) 
 {
-    t_cmds *cmd = mini->cmds;
-
+    t_cmds *cmd = initialize_cmds();
     while (cmd) 
     {
-        // Handle here document redirection
         if (cmd->redirect && cmd->redirect->redirect_type == 3) 
         {
             handle_here_document(mini, cmd->redirect->infile);
@@ -221,10 +220,8 @@ void execute_commands(t_mini *mini)
             continue;
         }
 
-        // Handle input/output redirection
         handle_redirection(mini, cmd);
 
-        // Execute multiple commands in a pipeline
         execute_pipeline(mini);
 
         cmd = cmd->next;

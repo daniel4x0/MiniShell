@@ -77,7 +77,6 @@ int	main(int argc, char **argv, char **envp)
 		    {
 			    if (parse_input(mini))
                 {
-                    //printf("holy\n");
                     execute_commands(mini);
                 }
 		    }
