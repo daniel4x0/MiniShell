@@ -51,10 +51,12 @@ typedef struct s_mini
     int cmds_count;
     int fdin;                // init to NULL
     int fdout;               // init to NULL
+    int i;                  
     char **env;              // (full_path)
     char **toks;             // (full_cmds)
     char *str;
     int toks_count;
+    int hd;
     int args;
     int redirect;
 } t_mini;

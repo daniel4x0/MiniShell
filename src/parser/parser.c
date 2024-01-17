@@ -18,19 +18,21 @@ t_parse *initialize_parser()
 
 t_cmds *initialize_cmds() 
 {
-    t_cmds *cmds = (t_cmds *)malloc(sizeof(t_cmds) * 100000);
+    t_cmds *cmds = (t_cmds *)malloc(sizeof(t_cmds) * 1);
     if (cmds == NULL) 
     {
         exit(EXIT_FAILURE);
     }
 
-    cmds->cmd = (char *)malloc(sizeof(char *) * 1000);
-    cmds->args = (char **)malloc(sizeof(char **) * 1000);
+    //cmds->cmd = (char *)malloc(sizeof(char *) * 1000);
+    //cmds->args = (char **)malloc(sizeof(char **) * 1000);
     cmds->redirect = (t_redirect *)malloc(sizeof(t_redirect));
     if (cmds->redirect == NULL) 
     {
         exit(EXIT_FAILURE);
     }
+    cmds->cmd = NULL;
+    cmds->args = NULL;
     cmds->redirect->infile = NULL;
     cmds->redirect->outfile = NULL;
     cmds->redirect->redirect_type = 0;
@@ -107,7 +109,7 @@ int count_redirection_toks(t_mini *mini, t_parse *parser)
 }
 
 
-int handle_redirection_1(t_cmds *cmds, char **toks, t_parse *parser, int i) 
+/*int handle_redirection_1(t_cmds *cmds, char **toks, t_parse *parser, int i) 
 {
     (void)parser;
     if (!toks[i + 1] || strcmp(toks[i + 1], "|") == 0) 
@@ -139,9 +141,30 @@ int handle_redirection_1(t_cmds *cmds, char **toks, t_parse *parser, int i)
     //printf("%d\n", cmds->redirect_count);
     //printf("%s\n", toks[i + 1]);
     return i;
+}*/
+
+int	handle_redirection_1(t_cmds *cmds, char **toks, t_parse *parser, int i) //(>, >>)
+{
+	if (!toks[parser->toks + 1] || ft_strncmp(toks[parser->toks + 1], "|", 1) == 0)
+	{
+		printf("Error: Missing argument for redirection.\n");
+		return (-1);
+	}
+	if (toks[parser->toks + 1][0] == '>' || toks[parser->toks + 1][0] == '<')
+		parser->toks++;
+	else
+	{
+		cmds->redirect[cmds->redirect_count].outfile
+			= ft_strdup(toks[parser->toks + 1]);
+		cmds->redirect[cmds->redirect_count].redirect_type = i;
+		cmds->redirect_count++;
+		cmds->fdo = 1;
+		parser->toks += 2;
+	}
+	return (parser->toks);
 }
 
-int handle_redirection_2(t_cmds *cmds, char **toks, t_parse *parser, int i) 
+/*int handle_redirection_2(t_cmds *cmds, char **toks, t_parse *parser, int i) 
 {
     (void)parser;
     if (!toks[i + 1] || strcmp(toks[i + 1], "|") == 0) 
@@ -166,12 +189,35 @@ int handle_redirection_2(t_cmds *cmds, char **toks, t_parse *parser, int i)
     }
 
     return i;
+}*/
+
+int	handle_redirection_2(t_cmds *cmds, char **toks, t_parse *parser, int i)
+{
+	if (!toks[parser->toks + 1] || ft_strncmp(toks[parser->toks + 1], "|", 1) == 0)
+	{
+		printf("Error: Missing argument for redirection.\n");
+		return (-1);
+	}
+	if (toks[parser->toks + 1][0] == '>' || toks[parser->toks + 1][0] == '<')
+		parser->toks++;
+	else
+	{
+		cmds->redirect[cmds->redirect_count].infile
+			= ft_strdup(toks[parser->toks + 1]);
+		cmds->redirect[cmds->redirect_count].redirect_type = i;
+		cmds->redirect_count++;
+		cmds->fdi = 1;
+		parser->toks += 2;
+	}
+	return (parser->toks);
 }
 
 // Function to handle adding the last command in the command sequence to the cmds structure
 void	handle_last_command(t_mini *mini, t_parse *parser, t_cmds *cmds)
 {
     initialize_cmds();
+	cmds->cmd = (char *)malloc(sizeof(char *) * 1000);
+    cmds->args = (char **)malloc(sizeof(char **) * 1000);
 	if (cmds->cmd == NULL)
 	{
 		cmds->cmd = ft_strdup(mini->toks[parser->toks]);
@@ -195,7 +241,8 @@ void	handle_last_command(t_mini *mini, t_parse *parser, t_cmds *cmds)
 t_cmds *create_new_command() 
 {
     t_cmds *new_cmd = malloc(sizeof(t_cmds));
-    if (!new_cmd) {
+    if (!new_cmd) 
+    {
         exit(EXIT_FAILURE);
     }
 
@@ -226,6 +273,7 @@ int parse_input(t_mini *mini)
             {
                 //printf("porcodio\n");
                 i = handle_redirection_1(current, mini->toks, parser, i);
+                printf("porcodio\n");
             } 
             else if (mini->toks[i][0] == '<') 
             {
