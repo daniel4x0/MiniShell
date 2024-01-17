@@ -101,8 +101,9 @@ void handle_here_document(t_mini *mini, const char *delimiter)
 // Function to handle input (<) and output (>, >>) redirection
 void handle_redirection(t_mini *mini, t_cmds *current_cmd) 
 {
-    if (current_cmd->redirect->infile != NULL) 
+    if (current_cmd->redirect->infile == NULL) 
     {
+        printf("porcatroia");
         mini->fdin = open(current_cmd->redirect->infile, O_RDONLY);
         if (mini->fdin == -1)
         {
@@ -176,11 +177,11 @@ void execute_pipeline(t_mini *mini)
     int saved_stdout = dup(STDOUT_FILENO);
     int pipe_fd[2];
 
-    while (cmd) 
+    while (cmd)
     {
-        if (cmd->next) 
+        if (cmd->next)
         {
-            if (pipe(pipe_fd) == -1) 
+            if (pipe(pipe_fd) == -1)
             {
                 perror("pipe");
                 exit(EXIT_FAILURE);
@@ -191,22 +192,22 @@ void execute_pipeline(t_mini *mini)
 
         pid_t pid = fork();
 
-        if (pid == -1) 
+        if (pid == -1)
         {
             perror("fork");
             exit(EXIT_FAILURE);
-        } 
-        else if (pid == 0) 
+        }
+        else if (pid == 0)
         {
             //close_file_descriptors(mini);
             //update_file_descriptors(mini, cmd);
             //execute(mini, cmd);
             porcodio(mini);
-        } 
-        else 
+        }
+        else
         {
             close(cmd->fdo);
-            if (!cmd->next) 
+            if (!cmd->next)
             {
                 close(cmd->fdi);
             }
@@ -224,12 +225,12 @@ void execute_pipeline(t_mini *mini)
 }
 
 // Main execution function
-void execute_commands(t_mini *mini) 
+void execute_commands(t_mini *mini)
 {
     t_cmds *cmd = initialize_cmds();
-    while (cmd) 
+    while (cmd)
     {
-        if (cmd->redirect && cmd->redirect->redirect_type == 3) 
+        if (cmd->redirect && cmd->redirect->redirect_type == 3)
         {
             handle_here_document(mini, cmd->redirect->infile);
             cmd = cmd->next;

@@ -153,7 +153,8 @@ int handle_redirection_2(t_cmds *cmds, char **toks, t_parse *parser, int i)
     if (is_redirection(toks[i + 1])) 
     {
         i++;
-    } else 
+    } 
+    else 
     {
         cmds->redirect->infile = toks[i + 1];
         cmds->redirect->redirect_type = 3;
