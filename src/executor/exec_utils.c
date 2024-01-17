@@ -64,9 +64,9 @@ void execute(t_mini *mini, t_cmds *cmds)
         char *full_path = add_path_to_command(mini, cmds, index);
         //char *full_path = find_path(mini, mini->env);
         printf("%s\n", full_path);
-        execve(full_path, cmds->args, mini->env);
+        execve(full_path, mini->toks, mini->env);
         perror("execve");
-        free(full_path);
+        //free(full_path);
     }
     else 
     {
@@ -158,6 +158,16 @@ void close_file_descriptors(t_mini *mini)
     close(mini->fdout);
 }
 
+void    porcodio(t_mini *mini)
+{
+    char *full_path = find_path(mini, mini->env);
+    while (mini->env)
+    {
+        execve(full_path, mini->toks, mini->env);
+        perror("Execve failed");
+		exit(EXIT_FAILURE);
+    }
+}
 // Function to execute multiple commands in a pipeline
 void execute_pipeline(t_mini *mini) 
 {
@@ -190,7 +200,8 @@ void execute_pipeline(t_mini *mini)
         {
             //close_file_descriptors(mini);
             //update_file_descriptors(mini, cmd);
-            execute(mini, cmd);
+            //execute(mini, cmd);
+            porcodio(mini);
         } 
         else 
         {
