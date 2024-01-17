@@ -15,18 +15,23 @@ int find_env_index(char **env, const char *var)
 int find_binary_path(t_mini *mini, t_cmds *cmds) 
 {
     int index = 0;
-    while (mini->env[index] != NULL) {
-        if (strncmp(mini->env[index], "PATH=", 5) == 0) {
+    while (mini->env[index] != NULL) 
+    {
+        if (strncmp(mini->env[index], "PATH=", 5) == 0) 
+        {
             char *path = mini->env[index] + 5;
             char *token = strtok(path, ":");
-            while (token != NULL) {
+            while (token != NULL) 
+            {
                 char *full_path = malloc(strlen(token) + strlen(cmds->cmd) + 2);
-                if (full_path == NULL) {
+                if (full_path == NULL) 
+                {
                     perror("malloc");
                     exit(EXIT_FAILURE);
                 }
                 sprintf(full_path, "%s/%s", token, cmds->cmd);
-                if (access(full_path, X_OK) == 0) {
+                if (access(full_path, X_OK) == 0) 
+                {
                     return index;
                 }
                 free(full_path);
@@ -56,8 +61,9 @@ void execute(t_mini *mini, t_cmds *cmds)
     int index = find_binary_path(mini, cmds);
     if (index != -1)
     {
-        //char *full_path = add_path_to_command(mini, cmds, index);
-        char *full_path = find_path(mini, mini->env);
+        char *full_path = add_path_to_command(mini, cmds, index);
+        //char *full_path = find_path(mini, mini->env);
+        printf("%s\n", full_path);
         execve(full_path, cmds->args, mini->env);
         perror("execve");
         free(full_path);
@@ -182,9 +188,8 @@ void execute_pipeline(t_mini *mini)
         } 
         else if (pid == 0) 
         {
-            printf("fanculo\n");
-            close_file_descriptors(mini);
-            update_file_descriptors(mini, cmd);
+            //close_file_descriptors(mini);
+            //update_file_descriptors(mini, cmd);
             execute(mini, cmd);
         } 
         else 

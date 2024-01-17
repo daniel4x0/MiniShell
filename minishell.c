@@ -73,12 +73,9 @@ int	main(int argc, char **argv, char **envp)
         }
         if (input && input[0])
 		{
-            if (run_lexer (input, mini))
+            if (run_lexer(input, mini) && parse_input(mini))
 		    {
-			    if (parse_input(mini))
-                {
-                    execute_commands(mini);
-                }
+                execute_commands(mini);
 		    }
         }
 		//free_cmds(&mini, input);
