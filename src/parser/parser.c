@@ -109,6 +109,7 @@ int count_redirection_toks(t_mini *mini, t_parse *parser)
 
 int handle_redirection_1(t_cmds *cmds, char **toks, t_parse *parser, int i) 
 {
+    printf("%s\n", toks[i + 1]);
     (void)parser;
     if (!toks[i + 1] || strcmp(toks[i + 1], "|") == 0) 
     {
@@ -116,13 +117,19 @@ int handle_redirection_1(t_cmds *cmds, char **toks, t_parse *parser, int i)
         return -1;
     }
 
-    if (is_redirection(toks[i + 1])) {
+    if (is_redirection(toks[i + 1])) 
+    {
         i++;
-    } else {
+    } 
+    else 
+    {
         cmds->redirect->outfile = toks[i + 1];
-        if (toks[i][0] == '>') {
+        if (toks[i][0] == '>') 
+        {
             cmds->redirect->redirect_type = 1;
-        } else {
+        } 
+        else 
+        {
             cmds->redirect->redirect_type = 3;
         }
         cmds->redirect->infile = NULL;
@@ -216,8 +223,10 @@ int parse_input(t_mini *mini)
         {
             if (mini->toks[i][0] == '>') 
             {
+                //printf("porcodio\n");
                 i = handle_redirection_1(current, mini->toks, parser, i);
-            } else if (mini->toks[i][0] == '<') 
+            } 
+            else if (mini->toks[i][0] == '<') 
             {
                 i = handle_redirection_2(current, mini->toks, parser, i);
             }
