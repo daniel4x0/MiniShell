@@ -109,7 +109,6 @@ int count_redirection_toks(t_mini *mini, t_parse *parser)
 
 int handle_redirection_1(t_cmds *cmds, char **toks, t_parse *parser, int i) 
 {
-    printf("%s\n", toks[i + 1]);
     (void)parser;
     if (!toks[i + 1] || strcmp(toks[i + 1], "|") == 0) 
     {
@@ -137,7 +136,8 @@ int handle_redirection_1(t_cmds *cmds, char **toks, t_parse *parser, int i)
         cmds->fdo = 1;
         i += 2;
     }
-
+    //printf("%d\n", cmds->redirect_count);
+    //printf("%s\n", toks[i + 1]);
     return i;
 }
 
