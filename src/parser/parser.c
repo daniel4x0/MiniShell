@@ -108,43 +108,9 @@ int count_redirection_toks(t_mini *mini, t_parse *parser)
     return count;
 }
 
-
-/*int handle_redirection_1(t_cmds *cmds, char **toks, t_parse *parser, int i) 
-{
-    (void)parser;
-    if (!toks[i + 1] || strcmp(toks[i + 1], "|") == 0) 
-    {
-        printf("Error: Missing argument for redirection.\n");
-        return -1;
-    }
-
-    if (is_redirection(toks[i + 1])) 
-    {
-        i++;
-    } 
-    else 
-    {
-        cmds->redirect->outfile = toks[i + 1];
-        if (toks[i][0] == '>') 
-        {
-            cmds->redirect->redirect_type = 1;
-        } 
-        else 
-        {
-            cmds->redirect->redirect_type = 3;
-        }
-        cmds->redirect->infile = NULL;
-        cmds->redirect_count++;
-        cmds->fdo = 1;
-        i += 2;
-    }
-    //printf("%d\n", cmds->redirect_count);
-    //printf("%s\n", toks[i + 1]);
-    return i;
-}*/
-
 int	handle_redirection_1(t_cmds *cmds, char **toks, t_parse *parser, int i) //(>, >>)
 {
+    //cmds = initialize_cmds();
 	if (!toks[parser->toks + 1] || ft_strncmp(toks[parser->toks + 1], "|", 1) == 0)
 	{
 		printf("Error: Missing argument for redirection.\n");
@@ -161,35 +127,9 @@ int	handle_redirection_1(t_cmds *cmds, char **toks, t_parse *parser, int i) //(>
 		cmds->fdo = 1;
 		parser->toks += 2;
 	}
+    //printf("%s\n", cmds->redirect->outfile);
 	return (parser->toks);
 }
-
-/*int handle_redirection_2(t_cmds *cmds, char **toks, t_parse *parser, int i) 
-{
-    (void)parser;
-    if (!toks[i + 1] || strcmp(toks[i + 1], "|") == 0) 
-    {
-        printf("Error: Missing argument for redirection.\n");
-        return -1;
-    }
-
-    if (is_redirection(toks[i + 1])) 
-    {
-        i++;
-    } 
-    else 
-    {
-        cmds->redirect->infile = toks[i + 1];
-        cmds->redirect->redirect_type = 3;
-        cmds->redirect->outfile = NULL;
-        cmds->redirect->redirect_type = 0;
-        cmds->redirect_count++;
-        cmds->fdi = 1;
-        i += 2;
-    }
-
-    return i;
-}*/
 
 int	handle_redirection_2(t_cmds *cmds, char **toks, t_parse *parser, int i)
 {
@@ -208,7 +148,7 @@ int	handle_redirection_2(t_cmds *cmds, char **toks, t_parse *parser, int i)
 		cmds->redirect_count++;
 		cmds->fdi = 1;
 		parser->toks += 2;
-	}
+    }
 	return (parser->toks);
 }
 
@@ -273,7 +213,6 @@ int parse_input(t_mini *mini)
             {
                 //printf("porcodio\n");
                 i = handle_redirection_1(current, mini->toks, parser, i);
-                printf("porcodio\n");
             } 
             else if (mini->toks[i][0] == '<') 
             {

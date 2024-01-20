@@ -175,12 +175,13 @@ void handle_here_document(t_mini *mini, const char *delimiter)
 // Function to handle input (<) and output (>, >>) redirection
 void handle_redirection(t_mini *mini, t_cmds *current_cmd) 
 {
-    current_cmd->redirect->infile = (char *)malloc(sizeof(char *) * 1000);
-    current_cmd->redirect->outfile = (char *)malloc(sizeof(char *) * 1000);
-    //printf("porcodio\n");
+    printf("%s\n", current_cmd->redirect->outfile);
+    //current_cmd = initialize_cmds();
+    //current_cmd->redirect->infile = (char *)malloc(sizeof(char *) * 1000);
+    //current_cmd->redirect->outfile = (char *)malloc(sizeof(char *) * 1000);
     if (current_cmd->redirect->infile != NULL) 
     {
-        //current_cmd->redirect->infile = (char *)malloc(sizeof(char *) * 1000);
+        //printf("popstar");
         mini->fdin = open(current_cmd->redirect->infile, O_RDONLY);
         if (mini->fdin == -1)
         {
@@ -191,8 +192,7 @@ void handle_redirection(t_mini *mini, t_cmds *current_cmd)
 
     if (current_cmd->redirect->outfile != NULL) 
     {
-        //current_cmd->redirect->infile = (char *)malloc(sizeof(char *) * 1000);
-        //printf("porcodio\n");
+        //printf("%s\n", current_cmd->redirect->outfile);
         int flags;
         if (current_cmd->redirect->redirect_type == 1) 
         {
@@ -238,7 +238,6 @@ void update_file_descriptors(t_mini *mini, t_cmds *current_cmd)
     }
 }
 
-// Function to close file descriptors related to input and output
 void close_file_descriptors(t_mini *mini) 
 {
     close(mini->fdin);
@@ -301,11 +300,11 @@ void execute_pipeline(t_mini *mini)
 }
 
 // Main execution function
-void execute_commands(t_mini *mini)
+void execute_commands(t_mini *mini, t_cmds *cmd)
 {
-    t_cmds *cmd = initialize_cmds();
     while (cmd)
     {
+        //printf("%d\n", cmd->redirect->redirect_type);
         if (cmd->redirect && cmd->redirect->redirect_type == 3)
         {
             handle_here_document(mini, cmd->redirect->infile);

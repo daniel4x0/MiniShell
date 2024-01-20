@@ -70,7 +70,7 @@ int parse_input(t_mini *mini);
 
 //EXECUTOR
 //void execute_commands(t_mini *mini, char **env);
-void execute_commands(t_mini *mini);
+void execute_commands(t_mini *mini, t_cmds *cmd);
 void free_cmds(t_cmds *cmd);
 void initialize_lex(t_mini *lex);
 int run_lexer(const char *command, t_mini *lexer);

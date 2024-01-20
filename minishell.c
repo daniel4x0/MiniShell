@@ -21,7 +21,7 @@ t_mini *initialize_mini(char    **envp)
         exit(EXIT_FAILURE);
     }
 
-    mini->cmds = NULL;
+    mini->cmds = initialize_cmds();
     mini->fdin = STDIN_FILENO;
     mini->fdout = STDOUT_FILENO;
     mini->env = envp;
@@ -60,6 +60,7 @@ int	main(int argc, char **argv, char **envp)
     (void)argv;
 	const char	*input;
 	t_mini	*mini = initialize_mini(envp);
+    t_cmds  *cmd = initialize_cmds();
 	//int		i;
 
     //initialize_mini(envp);
@@ -75,7 +76,7 @@ int	main(int argc, char **argv, char **envp)
 		{
             if (run_lexer(input, mini) && parse_input(mini))
 		    {
-                execute_commands(mini);
+                execute_commands(mini, cmd);
 		    }
         }
 		//free_cmds(&mini, input);
