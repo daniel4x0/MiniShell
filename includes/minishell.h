@@ -70,12 +70,13 @@ int parse_input(t_mini *mini);
 
 //EXECUTOR
 //void execute_commands(t_mini *mini, char **env);
-void execute_commands(t_mini *mini, t_cmds *cmd);
+//void execute_commands(t_mini *mini, t_cmds *cmd);
+void execute_commands(t_mini *mini);
 void free_cmds(t_cmds *cmd);
 void initialize_lex(t_mini *lex);
 int run_lexer(const char *command, t_mini *lexer);
-t_mini *initialize_mini(char **envp);
-void handle_redirection(t_mini *mini, t_cmds *current_cmd);
+t_mini *initialize_mini();
+void handle_redirection(t_mini *mini);
 int	get_env(char **envp, t_mini *mini);
 char *find_path(t_mini *mini, char **env);
 t_cmds *initialize_cmds();

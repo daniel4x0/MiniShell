@@ -12,7 +12,7 @@ int find_env_index(char **env, const char *var)
     return -1;
 }
 
-int find_binary_path(t_mini *mini, t_cmds *cmds) 
+int find_binary_path(t_mini *mini) 
 {
     int index = 0;
     while (mini->env[index] != NULL) 
@@ -23,13 +23,13 @@ int find_binary_path(t_mini *mini, t_cmds *cmds)
             char *token = strtok(path, ":");
             while (token != NULL) 
             {
-                char *full_path = malloc(strlen(token) + strlen(cmds->cmd) + 2);
+                char *full_path = malloc(strlen(token) + strlen(mini->cmds->cmd) + 2);
                 if (full_path == NULL) 
                 {
                     perror("malloc");
                     exit(EXIT_FAILURE);
                 }
-                sprintf(full_path, "%s/%s", token, cmds->cmd);
+                sprintf(full_path, "%s/%s", token, mini->cmds->cmd);
                 if (access(full_path, X_OK) == 0) 
                 {
                     return index;
@@ -43,35 +43,35 @@ int find_binary_path(t_mini *mini, t_cmds *cmds)
     return -1;
 }
 
-char *add_path_to_command(t_mini *mini, t_cmds *cmds, int index)  
+char *add_path_to_command(t_mini *mini, int index)  
 {
     char *path = mini->env[index] + 5;
-    char *full_path = malloc(strlen(path) + strlen(cmds->cmd) + 2);
+    char *full_path = malloc(strlen(path) + strlen(mini->cmds->cmd) + 2);
     if (full_path == NULL) {
         perror("malloc");
         exit(EXIT_FAILURE);
     }
-    sprintf(full_path, "%s/%s", path, cmds->cmd);
+    sprintf(full_path, "%s/%s", path, mini->cmds->cmd);
     return full_path;
 } 
 
-void execute(t_mini *mini, t_cmds *cmds) 
+void execute(t_mini *mini) 
 {
-    int index = find_binary_path(mini, cmds);
+    int index = find_binary_path(mini);
     if (index != -1)
     {
-        char *full_path = add_path_to_command(mini, cmds, index);
+        char *full_path = add_path_to_command(mini, index);
         printf("%s\n", full_path);
 
         // Handle redirection
-        if (cmds->redirect_count > 0)
+        if (mini->cmds->redirect_count > 0)
         {
-            for (int i = 0; i < cmds->redirect_count; i++)
+            for (int i = 0; i < mini->cmds->redirect_count; i++)
             {
-                if (cmds->redirect[i].redirect_type == 1)
+                if (mini->cmds->redirect[i].redirect_type == 1)
                 {
                     // Output redirection (>)
-                    int fdout = open(cmds->redirect[i].outfile, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+                    int fdout = open(mini->cmds->redirect[i].outfile, O_WRONLY | O_CREAT | O_TRUNC, 0666);
                     if (fdout == -1)
                     {
                         perror("open");
@@ -80,10 +80,10 @@ void execute(t_mini *mini, t_cmds *cmds)
                     dup2(fdout, STDOUT_FILENO);
                     close(fdout);
                 }
-                else if (cmds->redirect[i].redirect_type == 2)
+                else if (mini->cmds->redirect[i].redirect_type == 2)
                 {
                     // Output redirection (>>)
-                    int fdout = open(cmds->redirect[i].outfile, O_WRONLY | O_CREAT | O_APPEND, 0666);
+                    int fdout = open(mini->cmds->redirect[i].outfile, O_WRONLY | O_CREAT | O_APPEND, 0666);
                     if (fdout == -1)
                     {
                         perror("open");
@@ -92,10 +92,10 @@ void execute(t_mini *mini, t_cmds *cmds)
                     dup2(fdout, STDOUT_FILENO);
                     close(fdout);
                 }
-                else if (cmds->redirect[i].redirect_type == 3)
+                else if (mini->cmds->redirect[i].redirect_type == 3)
                 {
                     // Input redirection (<)
-                    int fdin = open(cmds->redirect[i].infile, O_RDONLY);
+                    int fdin = open(mini->cmds->redirect[i].infile, O_RDONLY);
                     if (fdin == -1)
                     {
                         perror("open");
@@ -173,16 +173,17 @@ void handle_here_document(t_mini *mini, const char *delimiter)
 }
 
 // Function to handle input (<) and output (>, >>) redirection
-void handle_redirection(t_mini *mini, t_cmds *current_cmd) 
+void handle_redirection(t_mini *mini) 
 {
-    printf("%s\n", current_cmd->redirect->outfile);
+    printf("enters handle redirection fucntion\n");
+    //printf("%s\n", current_cmd->redirect->outfile);
     //current_cmd = initialize_cmds();
     //current_cmd->redirect->infile = (char *)malloc(sizeof(char *) * 1000);
     //current_cmd->redirect->outfile = (char *)malloc(sizeof(char *) * 1000);
-    if (current_cmd->redirect->infile != NULL) 
+    if (mini->cmds->redirect->infile != NULL) 
     {
         //printf("popstar");
-        mini->fdin = open(current_cmd->redirect->infile, O_RDONLY);
+        mini->fdin = open(mini->cmds->redirect->infile, O_RDONLY);
         if (mini->fdin == -1)
         {
             perror("open");
@@ -190,11 +191,11 @@ void handle_redirection(t_mini *mini, t_cmds *current_cmd)
         }
     }
 
-    if (current_cmd->redirect->outfile != NULL) 
+    if (mini->cmds->redirect->outfile != NULL) 
     {
         //printf("%s\n", current_cmd->redirect->outfile);
         int flags;
-        if (current_cmd->redirect->redirect_type == 1) 
+        if (mini->cmds->redirect->redirect_type == 1) 
         {
             flags = O_WRONLY | O_CREAT | O_TRUNC;
         }
@@ -203,7 +204,7 @@ void handle_redirection(t_mini *mini, t_cmds *current_cmd)
             flags = O_WRONLY | O_CREAT | O_APPEND;
         }
 
-        mini->fdout = open(current_cmd->redirect->outfile, flags, 0666);
+        mini->fdout = open(mini->cmds->redirect->outfile, flags, 0666);
         if (mini->fdout == -1)
         {
             perror("open");
@@ -213,12 +214,12 @@ void handle_redirection(t_mini *mini, t_cmds *current_cmd)
 }
 
 // Function to update file descriptors based on redirection information
-void update_file_descriptors(t_mini *mini, t_cmds *current_cmd)
+void update_file_descriptors(t_mini *mini)
 {
-    if (current_cmd->fdi != -1)
+    if (mini->cmds->fdi != -1)
     {
-        dup2(current_cmd->fdi, STDIN_FILENO);
-        close(current_cmd->fdi);
+        dup2(mini->cmds->fdi, STDIN_FILENO);
+        close(mini->cmds->fdi);
     }
     else 
     {
@@ -226,10 +227,10 @@ void update_file_descriptors(t_mini *mini, t_cmds *current_cmd)
         close(mini->fdin);
     }
 
-    if (current_cmd->fdo != -1) 
+    if (mini->cmds->fdo != -1) 
     {
-        dup2(current_cmd->fdo, STDOUT_FILENO);
-        close(current_cmd->fdo);
+        dup2(mini->cmds->fdo, STDOUT_FILENO);
+        close(mini->cmds->fdo);
     } 
     else 
     {
@@ -247,22 +248,23 @@ void close_file_descriptors(t_mini *mini)
 // Function to execute multiple commands in a pipeline
 void execute_pipeline(t_mini *mini) 
 {
-    t_cmds *cmd = initialize_cmds();
+    printf("enters execute pipeline fucntion\n");
+    //t_cmds *cmd = initialize_cmds();
     int saved_stdin = dup(STDIN_FILENO);
     int saved_stdout = dup(STDOUT_FILENO);
     int pipe_fd[2];
-
-    while (cmd)
+    while (mini->cmds)
     {
-        if (cmd->next)
+        printf("cmds isnt empty in exec pipeline fucntion\n");
+        if (mini->cmds->next)
         {
             if (pipe(pipe_fd) == -1)
             {
                 perror("pipe");
                 exit(EXIT_FAILURE);
             }
-            cmd->fdo = pipe_fd[1];
-            cmd->next->fdi = pipe_fd[0];
+            mini->cmds->fdo = pipe_fd[1];
+            mini->cmds->next->fdi = pipe_fd[0];
         }
 
         pid_t pid = fork();
@@ -274,6 +276,7 @@ void execute_pipeline(t_mini *mini)
         }
         else if (pid == 0)
         {
+            printf("pid: 0, enters condition, ready to execute with porcodio fucntion\n");
             //close_file_descriptors(mini);
             //update_file_descriptors(mini, cmd);
             //execute(mini, cmd);
@@ -281,15 +284,15 @@ void execute_pipeline(t_mini *mini)
         }
         else
         {
-            close(cmd->fdo);
-            if (!cmd->next)
+            close(mini->cmds->fdo);
+            if (!mini->cmds->next)
             {
-                close(cmd->fdi);
+                close(mini->cmds->fdi);
             }
             waitpid(pid, NULL, 0);
         }
 
-        cmd = cmd->next;
+        mini->cmds = mini->cmds->next;
     }
 
     dup2(saved_stdin, STDIN_FILENO);
@@ -300,22 +303,23 @@ void execute_pipeline(t_mini *mini)
 }
 
 // Main execution function
-void execute_commands(t_mini *mini, t_cmds *cmd)
+void execute_commands(t_mini *mini)
 {
-    while (cmd)
+    printf("enters exec commands fucntion\n");
+    while (mini->cmds)
     {
         //printf("%d\n", cmd->redirect->redirect_type);
-        if (cmd->redirect && cmd->redirect->redirect_type == 3)
+        if (mini->cmds->redirect && mini->cmds->redirect->redirect_type == 3)
         {
-            handle_here_document(mini, cmd->redirect->infile);
-            cmd = cmd->next;
+            handle_here_document(mini, mini->cmds->redirect->infile);
+            mini->cmds = mini->cmds->next;
             continue;
         }
 
-        handle_redirection(mini, cmd);
-
+        handle_redirection(mini);
+        printf(" successful\n");
         execute_pipeline(mini);
 
-        cmd = cmd->next;
+        mini->cmds = mini->cmds->next;
     }
 }

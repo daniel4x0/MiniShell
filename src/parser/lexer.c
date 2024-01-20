@@ -98,6 +98,7 @@ void lexer_main(const char *command, t_mini *lexer)
 
 int run_lexer(const char *command, t_mini *lexer) 
 {
+    printf("enters run lexer fucntion\n");
     lexer->toks = NULL;
     lexer->toks_count = 0;
 
@@ -106,6 +107,7 @@ int run_lexer(const char *command, t_mini *lexer)
     free((void *)command);
     if (lexer->toks_count > 0) 
     {
+        printf("toks count: %d\n", lexer->toks_count);
         return 1;
     } 
     else 
