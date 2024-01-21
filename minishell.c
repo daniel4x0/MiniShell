@@ -41,8 +41,8 @@ t_cmds *initialize_cmds()
         exit(EXIT_FAILURE);
     }
 
-    //cmds->cmd = (char *)malloc(sizeof(char *) * 1000);
-    //cmds->args = (char **)malloc(sizeof(char **) * 1000);
+    cmds->cmd = (char *)malloc(sizeof(char *) * 1000);
+    cmds->args = (char **)malloc(sizeof(char **) * 1000);
     cmds->redirect = (t_redirect *)malloc(sizeof(t_redirect));
     if (cmds->redirect == NULL)
     {

@@ -246,7 +246,7 @@ void close_file_descriptors(t_mini *mini)
 }
 
 // Function to execute multiple commands in a pipeline
-void execute_pipeline(t_mini *mini) 
+void execute_pipeline(t_mini *mini)
 {
     printf("enters execute pipeline fucntion\n");
     //t_cmds *cmd = initialize_cmds();
@@ -317,7 +317,6 @@ void execute_commands(t_mini *mini)
         }
 
         handle_redirection(mini);
-        printf(" successful\n");
         execute_pipeline(mini);
 
         mini->cmds = mini->cmds->next;
