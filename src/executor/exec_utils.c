@@ -1,324 +1,129 @@
-#include  "../../includes/minishell.h"
 
-int find_env_index(char **env, const char *var) 
+#include "../../includes/minishell.h"
+
+extern int	g_status;
+
+void	ft_lstadd_back(t_list **lst, t_list *new)
 {
-    int index = 0;
-    while (env[index] != NULL) {
-        if (strncmp(env[index], var, strlen(var)) == 0 && env[index][strlen(var)] == '=') {
-            return index;
-        }
-        index++;
-    }
-    return -1;
+	t_list	*tmp;
+
+	if (!lst || !new)
+		return ;
+	if (!*lst)
+	{
+		*lst = new;
+		return ;
+	}
+	tmp = *lst;
+	while (tmp->next)
+		tmp = tmp->next;
+	tmp->next = new;
 }
 
-int find_binary_path(t_mini *mini) 
+t_list	*ft_lstnew(void *content)
 {
-    int index = 0;
-    while (mini->env[index] != NULL) 
-    {
-        if (strncmp(mini->env[index], "PATH=", 5) == 0) 
-        {
-            char *path = mini->env[index] + 5;
-            char *token = strtok(path, ":");
-            while (token != NULL) 
-            {
-                char *full_path = malloc(strlen(token) + strlen(mini->cmds->cmd) + 2);
-                if (full_path == NULL) 
-                {
-                    perror("malloc");
-                    exit(EXIT_FAILURE);
-                }
-                sprintf(full_path, "%s/%s", token, mini->cmds->cmd);
-                if (access(full_path, X_OK) == 0) 
-                {
-                    return index;
-                }
-                free(full_path);
-                token = strtok(NULL, ":");
-            }
-        }
-        index++;
-    }
-    return -1;
+	t_list	*new;
+
+	new = (t_list *)malloc(sizeof(t_list));
+	if (new == NULL)
+		return (NULL);
+	new->content = content;
+	new->next = NULL;
+	return (new);
 }
 
-char *add_path_to_command(t_mini *mini, int index)  
+
+t_list	*ft_lstlast(t_list *lst)
 {
-    char *path = mini->env[index] + 5;
-    char *full_path = malloc(strlen(path) + strlen(mini->cmds->cmd) + 2);
-    if (full_path == NULL) {
-        perror("malloc");
-        exit(EXIT_FAILURE);
-    }
-    sprintf(full_path, "%s/%s", path, mini->cmds->cmd);
-    return full_path;
-} 
+	t_list	*tmp;
 
-void execute(t_mini *mini) 
-{
-    int index = find_binary_path(mini);
-    if (index != -1)
-    {
-        char *full_path = add_path_to_command(mini, index);
-        printf("%s\n", full_path);
-
-        // Handle redirection
-        if (mini->cmds->redirect_count > 0)
-        {
-            for (int i = 0; i < mini->cmds->redirect_count; i++)
-            {
-                if (mini->cmds->redirect[i].redirect_type == 1)
-                {
-                    // Output redirection (>)
-                    int fdout = open(mini->cmds->redirect[i].outfile, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-                    if (fdout == -1)
-                    {
-                        perror("open");
-                        exit(EXIT_FAILURE);
-                    }
-                    dup2(fdout, STDOUT_FILENO);
-                    close(fdout);
-                }
-                else if (mini->cmds->redirect[i].redirect_type == 2)
-                {
-                    // Output redirection (>>)
-                    int fdout = open(mini->cmds->redirect[i].outfile, O_WRONLY | O_CREAT | O_APPEND, 0666);
-                    if (fdout == -1)
-                    {
-                        perror("open");
-                        exit(EXIT_FAILURE);
-                    }
-                    dup2(fdout, STDOUT_FILENO);
-                    close(fdout);
-                }
-                else if (mini->cmds->redirect[i].redirect_type == 3)
-                {
-                    // Input redirection (<)
-                    int fdin = open(mini->cmds->redirect[i].infile, O_RDONLY);
-                    if (fdin == -1)
-                    {
-                        perror("open");
-                        exit(EXIT_FAILURE);
-                    }
-                    dup2(fdin, STDIN_FILENO);
-                    close(fdin);
-                }
-            }
-        }
-
-        execve(full_path, mini->toks, mini->env);
-        perror("execve");
-    }
-    else 
-    {
-        fprintf(stderr, "Error: Command not found\n");
-        exit(EXIT_FAILURE);
-    }
+	tmp = lst;
+	if (!lst)
+		return (NULL);
+	while (lst)
+	{
+		if (tmp->next == NULL)
+			return (tmp);
+		tmp = tmp->next;
+	}
+	return (tmp);
 }
 
-// Function to execute a command using execve after checking whether it's a built-in command or an external binary
-/*void execute(t_mini *mini, t_cmds *cmds) 
+void	execute_hm(char ***out, char *full, char *args, char **envp)
 {
-    int index = find_binary_path(mini, cmds);
-    if (index != -1)
-    {
-        char *full_path = add_path_to_command(mini, cmds, index);
-        //char *full_path = find_path(mini, mini->env);
-        printf("%s\n", full_path);
-        execve(full_path, mini->toks, mini->env);
-        perror("execve");
-        //free(full_path);
-    }
-    else 
-    {
-        fprintf(stderr, "Error: Command not found\n");
-        exit(EXIT_FAILURE);
-    }
-}*/
+	pid_t	pid;
+	int		fd[2];
+	char	**m;
 
-void    porcodio(t_mini *mini)
-{
-    char *full_path = find_path(mini, mini->env);
-    while (mini->env)
-    {
-        execve(full_path, mini->toks, mini->env);
-        perror("Execve failed");
-		exit(EXIT_FAILURE);
-    }
-}
-void handle_here_document(t_mini *mini, const char *delimiter) 
-{
-    (void)mini;
-    char *line = NULL;
-    size_t len = 0;
-
-    while (1) 
-    {
-        printf("<< ");
-        ssize_t read_bytes = getline(&line, &len, stdin);
-        if (read_bytes == -1) 
-        {
-            perror("getline");
-            exit(EXIT_FAILURE);
-        }
-
-        if (strcmp(line, delimiter) == 0) 
-        {
-            break;
-        }
-    }
-
-    free(line);
+	pipe(fd);
+	pid = fork();
+	if (!pid)
+	{
+		close(fd[0]);
+		m = ft_split(args, ' ');
+		dup2(fd[1], STDOUT_FILENO);
+		close(fd[1]);
+		if (!access(full, F_OK))
+			execve(full, m, envp);
+		exit (1);
+	}
+	close(fd[1]);
+	waitpid(pid, NULL, 0);
+	read_line_and_update(out, fd[0]);
+	close(fd[0]);
 }
 
-// Function to handle input (<) and output (>, >>) redirection
-void handle_redirection(t_mini *mini) 
+int	get_fd(char *full_path, int oldfd, int read_or_write, int write)
 {
-    printf("enters handle redirection fucntion\n");
-    //printf("%s\n", current_cmd->redirect->outfile);
-    //current_cmd = initialize_cmds();
-    //current_cmd->redirect->infile = (char *)malloc(sizeof(char *) * 1000);
-    //current_cmd->redirect->outfile = (char *)malloc(sizeof(char *) * 1000);
-    if (mini->cmds->redirect->infile != NULL) 
-    {
-        //printf("popstar");
-        mini->fdin = open(mini->cmds->redirect->infile, O_RDONLY);
-        if (mini->fdin == -1)
-        {
-            perror("open");
-            exit(EXIT_FAILURE);
-        }
-    }
+	int	fd;
 
-    if (mini->cmds->redirect->outfile != NULL) 
-    {
-        //printf("%s\n", current_cmd->redirect->outfile);
-        int flags;
-        if (mini->cmds->redirect->redirect_type == 1) 
-        {
-            flags = O_WRONLY | O_CREAT | O_TRUNC;
-        }
-        else
-        {
-            flags = O_WRONLY | O_CREAT | O_APPEND;
-        }
-
-        mini->fdout = open(mini->cmds->redirect->outfile, flags, 0666);
-        if (mini->fdout == -1)
-        {
-            perror("open");
-            exit(EXIT_FAILURE);
-        }
-    }
+	if (oldfd > 2)
+		close(oldfd);
+	if (!full_path)
+		return (-1);
+	if (access(full_path, F_OK) == -1 && !read_or_write)
+		mini_perror(NDIR, full_path, 127);
+	else if (!read_or_write && access(full_path, R_OK) == -1)
+		mini_perror(NPERM, full_path, 126);
+	else if (read_or_write && access(full_path, W_OK) == -1 && access(full_path, F_OK) == 0)
+		mini_perror(NPERM, full_path, 126);
+	if (read_or_write && write)
+		fd = open(full_path, O_CREAT | O_WRONLY | O_APPEND, 0666);
+	else if (read_or_write && !write)
+		fd = open(full_path, O_CREAT | O_WRONLY | O_TRUNC, 0666);
+	else if (!read_or_write && oldfd != -1)
+		fd = open(full_path, O_RDONLY);
+	else
+		fd = oldfd;
+	return (fd);
 }
 
-// Function to update file descriptors based on redirection information
-void update_file_descriptors(t_mini *mini)
+t_list	*node_refil(char **args, int i)
 {
-    if (mini->cmds->fdi != -1)
-    {
-        dup2(mini->cmds->fdi, STDIN_FILENO);
-        close(mini->cmds->fdi);
-    }
-    else 
-    {
-        dup2(mini->fdin, STDIN_FILENO);
-        close(mini->fdin);
-    }
+	t_list	*cmds[2];
+	char	**store1;
+	char	**store2;
 
-    if (mini->cmds->fdo != -1) 
-    {
-        dup2(mini->cmds->fdo, STDOUT_FILENO);
-        close(mini->cmds->fdo);
-    } 
-    else 
-    {
-        dup2(mini->fdout, STDOUT_FILENO);
-        close(mini->fdout);
-    }
+	cmds[0] = NULL;
+	store2 = trim_dump(args);
+	while (args[++i])
+	{
+		cmds[1] = ft_lstlast(cmds[0]);
+		if (i == 0 || (args[i][0] == '|' && args[i + 1] && args[i + 1][0]))
+		{
+			i += args[i][0] == '|';
+			ft_lstadd_back(&cmds[0], ft_lstnew(initialize_mini()));
+			cmds[1] = ft_lstlast(cmds[0]);
+		}
+		store1 = args;
+		cmds[1]->content = handle_pipe_redir(cmds[1]->content, store1, store2, &i);
+		if (i < 0)
+			return (end_fill(cmds[0], args, store2));
+		if (!args[i])
+			break ;
+	}
+	free_matrix(&store2);
+	free_matrix(&args);
+	return (cmds[0]);
 }
 
-void close_file_descriptors(t_mini *mini) 
-{
-    close(mini->fdin);
-    close(mini->fdout);
-}
-
-// Function to execute multiple commands in a pipeline
-void execute_pipeline(t_mini *mini)
-{
-    printf("enters execute pipeline fucntion\n");
-    //t_cmds *cmd = initialize_cmds();
-    int saved_stdin = dup(STDIN_FILENO);
-    int saved_stdout = dup(STDOUT_FILENO);
-    int pipe_fd[2];
-    while (mini->cmds)
-    {
-        printf("cmds isnt empty in exec pipeline fucntion\n");
-        if (mini->cmds->next)
-        {
-            if (pipe(pipe_fd) == -1)
-            {
-                perror("pipe");
-                exit(EXIT_FAILURE);
-            }
-            mini->cmds->fdo = pipe_fd[1];
-            mini->cmds->next->fdi = pipe_fd[0];
-        }
-
-        pid_t pid = fork();
-
-        if (pid == -1)
-        {
-            perror("fork");
-            exit(EXIT_FAILURE);
-        }
-        else if (pid == 0)
-        {
-            printf("pid: 0, enters condition, ready to execute with porcodio fucntion\n");
-            //close_file_descriptors(mini);
-            //update_file_descriptors(mini, cmd);
-            //execute(mini, cmd);
-            porcodio(mini);
-        }
-        else
-        {
-            close(mini->cmds->fdo);
-            if (!mini->cmds->next)
-            {
-                close(mini->cmds->fdi);
-            }
-            waitpid(pid, NULL, 0);
-        }
-
-        mini->cmds = mini->cmds->next;
-    }
-
-    dup2(saved_stdin, STDIN_FILENO);
-    dup2(saved_stdout, STDOUT_FILENO);
-
-    close(saved_stdin);
-    close(saved_stdout);
-}
-
-// Main execution function
-void execute_commands(t_mini *mini)
-{
-    printf("enters exec commands fucntion\n");
-    while (mini->cmds)
-    {
-        //printf("%d\n", cmd->redirect->redirect_type);
-        if (mini->cmds->redirect && mini->cmds->redirect->redirect_type == 3)
-        {
-            handle_here_document(mini, mini->cmds->redirect->infile);
-            mini->cmds = mini->cmds->next;
-            continue;
-        }
-
-        handle_redirection(mini);
-        execute_pipeline(mini);
-
-        mini->cmds = mini->cmds->next;
-    }
-}

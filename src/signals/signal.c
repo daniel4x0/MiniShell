@@ -1,27 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_isalpha.c                                       :+:      :+:    :+:   */
+/*   signal.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: grinella <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: duzegbu <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/16 14:30:38 by grinella          #+#    #+#             */
-/*   Updated: 2023/01/16 18:23:53 by grinella         ###   ########.fr       */
+/*   Created: 2024/01/25 11:58:21 by duzegbu           #+#    #+#             */
+/*   Updated: 2024/01/25 11:58:24 by duzegbu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../includes/minishell.h"
 
-int	ft_isspace(char c)
-{
-	return ((c >= 9 && c <= 13) || c == ' ');
-}
+int	g_status;
 
-int	ft_isalpha(int c)
+void	handle_sigint(int sig)
 {
-	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+	if (sig == SIGINT)
 	{
-		return (1);
+		g_status = 130;
+		ioctl(STDIN_FILENO, TIOCSTI, "\n");
+		rl_replace_line("", 0);
+		rl_on_new_line();
 	}
-	return (0);
 }

@@ -1,211 +1,117 @@
+
 #include "../../includes/minishell.h"
 
-t_parse *initialize_parser()
+extern int	g_status;
+
+void	ft_lstdelone(t_list *lst, void (*del)(void *))
 {
-    t_parse *parser = (t_parse *)malloc(sizeof(t_parse));
-    if (parser == NULL)
-    {
-        exit(EXIT_FAILURE);
-    }
-
-    parser->toks = 0;
-    parser->p_args = 0;
-    parser->red = 0;
-    parser->args = 0;
-
-    return parser;
+	if (!lst || !del)
+		return ;
+	del(lst->content);
+	free(lst);
 }
 
-int open_next_file(const char *filename) 
+void	ft_lstclear(t_list **lst, void (*del)(void *))
 {
-    int fd;
+	t_list	*tmp;
 
-    if (strcmp(filename, "<") == 0) 
-    {
-        fprintf(stderr, "Error: Missing input file after '<'\n");
-        exit(EXIT_FAILURE);
-    } else if (strcmp(filename, ">") == 0)
-    {
-        fprintf(stderr, "Error: Missing output file after '>'\n");
-        exit(EXIT_FAILURE);
-    } else if (strcmp(filename, ">>") == 0) 
-    {
-        fprintf(stderr, "Error: Missing output file after '>>'\n");
-        exit(EXIT_FAILURE);
-    }
-
-    fd = open(filename, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-    if (fd == -1) 
-    {
-        perror("Error opening file");
-        exit(EXIT_FAILURE);
-    }
-
-    return fd;
-}
-
-int is_redirection(char *str) 
-{
-    return (str && (str[0] == '<' || str[0] == '>' || (str[1] && str[1] == '>')));
-}
-
-int count_total_redirection(t_mini *mini, int i) 
-{
-    while (mini->toks[i] && is_redirection(mini->toks[i])) 
-    {
-        i++;
-    }
-    return i;
-}
-
-int count_total_args(t_mini *mini, t_parse *parser) 
-{
-    int count = 0;
-    while (mini->toks[parser->args] && !is_redirection(mini->toks[parser->args]) && strcmp(mini->toks[parser->args], "|") != 0) 
-    {
-        parser->args++;
-        count++;
-    }
-    return count;
-}
-
-int count_redirection_toks(t_mini *mini, t_parse *parser) 
-{
-    int count = 0;
-    while (mini->toks[parser->red] && is_redirection(mini->toks[parser->red])) 
-    {
-        parser->red++;
-        count++;
-    }
-    return count;
-}
-
-int	handle_redirection_1(t_mini *mini, char **toks, t_parse *parser, int i) //(>, >>)
-{
-    //cmds = initialize_cmds();
-	if (!toks[parser->toks + 1] || ft_strncmp(toks[parser->toks + 1], "|", 1) == 0)
+	if (!lst || !del)
+		return ;
+	while (*lst)
 	{
-		printf("Error: Missing argument for redirection.\n");
-		return (-1);
+		tmp = (*lst)->next;
+		ft_lstdelone(*lst, del);
+		*lst = tmp;
 	}
-	if (toks[parser->toks + 1][0] == '>' || toks[parser->toks + 1][0] == '<')
-		parser->toks++;
+}
+
+int	ft_lstsize(t_list *lst)
+{
+	int		count;
+	t_list	*current;
+
+	count = 0;
+	current = lst;
+	if (current)
+		count++;
 	else
+		return (0);
+	while (current->next != 0)
 	{
-		mini->cmds->redirect[mini->cmds->redirect_count].outfile
-			= ft_strdup(toks[parser->toks + 1]);
-		mini->cmds->redirect[mini->cmds->redirect_count].redirect_type = i;
-		mini->cmds->redirect_count++;
-		mini->cmds->fdo = 1;
-		parser->toks += 2;
+		count++;
+		current = current->next;
 	}
-    //printf("%s\n", cmds->redirect->outfile);
-	return (parser->toks);
+	return (count);
 }
 
-int	handle_redirection_2(t_mini *mini, char **toks, t_parse *parser, int i)
+char	*full_trim(char const *str, int in_quotes_single, int in_quotes_double)
 {
-	if (!toks[parser->toks + 1] || ft_strncmp(toks[parser->toks + 1], "|", 1) == 0)
+	char	*result;
+	int		count;
+	int		res; //index for trimmed string
+	int		i;  //index for input string
+
+	res = -1;
+	i = 0;
+	count = amount_of_space(str);
+	if (!str || count == -1)
+		return (NULL);
+	result = malloc(sizeof(char) * (ft_strlen(str) - count + 1));
+	if (!result)
+		return (NULL);
+	while (str[i])
 	{
-		printf("Error: Missing argument for redirection.\n");
-		return (-1);
+		in_quotes_single = (in_quotes_single + (!in_quotes_double && str[i] == '\'')) % 2;
+		in_quotes_double = (in_quotes_double + (!in_quotes_single && str[i] == '\"')) % 2;
+		if ((str[i] != '\"' || in_quotes_single) && (str[i] != '\'' || in_quotes_double) \
+			&& ++res >= 0)
+			result[res] = str[i];
+		i++;
 	}
-	if (toks[parser->toks + 1][0] == '>' || toks[parser->toks + 1][0] == '<')
-		parser->toks++;
-	else
-	{
-		mini->cmds->redirect[mini->cmds->redirect_count].infile
-			= ft_strdup(toks[parser->toks + 1]);
-		mini->cmds->redirect[mini->cmds->redirect_count].redirect_type = i;
-		mini->cmds->redirect_count++;
-		mini->cmds->fdi = 1;
-		parser->toks += 2;
-    }
-	return (parser->toks);
+	result[++res] = '\0';
+	return (result);
 }
 
-// Function to handle adding the last command in the command sequence to the cmds structure
-void	handle_last_command(t_mini *mini, t_parse *parser)
+char	*env_expander(t_commands *commands, char *str, int index)
 {
-    printf("entered handle last command fucntion\n");
-    //initialize_cmds();
-	mini->cmds->cmd = (char *)malloc(sizeof(char *) * 1000);
-    mini->cmds->args = (char **)malloc(sizeof(char **) * 1000);
-	if (mini->cmds->cmd == NULL)
+	int	in_quote_single = 0;
+	int	in_quote_double = 0;
+	while (str && str[++index])
 	{
-        printf("cmd is null\n");
-		mini->cmds->cmd = ft_strdup(mini->toks[parser->toks]);
-		mini->cmds->args[0] = ft_strdup(mini->toks[parser->toks]);
-		parser->toks++;
+		in_quote_single = (in_quote_single + (!in_quote_double && str[index] == '\'')) % 2;
+		in_quote_double = (in_quote_double + (!in_quote_single && str[index] == '\"')) % 2;
+		if (!in_quote_single && str[index] == '$' && str[index + 1] && \
+			((strchr_mod(&str[index + 1], "/~%^{}:; ") && !in_quote_double) || \
+			(strchr_mod(&str[index + 1], "/~%^{}:;\"") && in_quote_double)))
+			return (env_expander(commands, toks_extract(commands, str, ++index), -1));
 	}
-	else
+	return (str);
+}
+
+void	*parse_input(char **args, t_commands *commands)
+{
+	printf("ready to parse\n");
+	int	exit;
+	int	i;
+
+	exit = 0;
+	commands->cmds = node_refil(switch_matrix(commands, args), -1);
+	if (!commands->cmds)
+		return (commands);
+	i = ft_lstsize(commands->cmds);
+	g_status = builtin(commands, commands->cmds, &exit, 0);
+	while (i-- > 0)
+		waitpid(-1, &g_status, 0);
+	if (!exit && g_status == 13)
+		g_status = 0;
+	if (g_status > 255)
+		g_status = g_status / 255;
+	if (args && exit)
 	{
-		while (mini->toks[parser->toks]
-			&& ft_strncmp(mini->toks[parser->toks], "|", 1)
-			&& !is_redirection(mini->toks[parser->toks]))
-		{
-			mini->cmds->args[parser->p_args] = ft_strdup(mini->toks[parser->toks]);
-			parser->toks++;
-		}
+		ft_lstclear(&commands->cmds, free_content);
+		return (NULL);
 	}
-	parser->p_args++;
-	mini->cmds->args[parser->p_args] = NULL;
+	return (commands);
 }
 
-t_cmds *create_new_command() 
-{
-    t_cmds *new_cmd = malloc(sizeof(t_cmds));
-    if (!new_cmd) 
-    {
-        exit(EXIT_FAILURE);
-    }
 
-    new_cmd->redirect = NULL;
-    new_cmd->next = NULL;
-
-    return new_cmd;
-}
-
-int parse_input(t_mini *mini) 
-{
-    printf("enters parse function\n");
-    t_cmds *head = initialize_cmds();
-    t_cmds *current = head;
-    t_parse *parser = initialize_parser();
-    int i = 0;
-
-    while (mini->toks[i]) 
-    {
-        if (strcmp(mini->toks[i], "|") == 0) 
-        {
-            current->next = initialize_cmds();
-            current = current->next;
-            parser->args++;
-        } 
-        else if (is_redirection(mini->toks[i])) 
-        {
-            if (mini->toks[i][0] == '>') 
-            {
-                //printf("porcodio\n");
-                i = handle_redirection_1(mini, mini->toks, parser, i);
-            } 
-            else if (mini->toks[i][0] == '<') 
-            {
-                i = handle_redirection_2(mini, mini->toks, parser, i);
-            }
-
-            if (i == -1) 
-            {
-                return -1;
-            }
-        } 
-        else
-        {
-            printf("trying to enter handle last command fucntion\n");
-            handle_last_command(mini, parser);
-        }
-
-        i++;
-    }
-    return 1;
-}

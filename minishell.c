@@ -3,117 +3,123 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaruso <ecaruso@student.42.fr>            +#+  +:+       +#+        */
+/*   By: duzegbu <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/23 10:57:44 by grinella          #+#    #+#             */
-/*   Updated: 2024/01/06 02:01:56 by duzegbu          ###   ########.fr       */
+/*   Created: 2024/01/25 10:53:17 by duzegbu           #+#    #+#             */
+/*   Updated: 2024/01/25 10:53:19 by duzegbu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/minishell.h"
 
-t_mini *initialize_mini()
+extern int	g_status;
+
+void	cmd_extract(t_commands *commands, t_list *cmd, char **str, char *path)
 {
-    t_mini *mini = malloc(sizeof(t_mini));
-    if (!mini)
-    {
-        perror("Brutto STronzo");
-        exit(EXIT_FAILURE);
-    }
+	t_mini	*mini;
+	DIR		*directory;
 
-    mini->cmds = initialize_cmds();
-    mini->fdin = STDIN_FILENO;
-    mini->fdout = STDOUT_FILENO;
-    //mini->env = envp;
-    mini->toks = 0;
-    mini->toks_count = 0;
-    mini->args = 0;
-    mini->redirect = 0;
-
-    return mini;
+	mini = cmd->content;
+	directory = check_cmd(commands, cmd, &str, path);
+	if (!is_builtin(mini) && mini && mini->toks && directory)
+		mini_perror(IS_DIR, *mini->toks, 126);
+	else if (!is_builtin(mini) && mini && mini->env && \
+		access(mini->env, F_OK) == -1)
+		mini_perror(NDIR, mini->env, 127);
+	else if (!is_builtin(mini) && mini && mini->env && \
+		access(mini->env, X_OK) == -1)
+		mini_perror(NPERM, mini->env, 126);
+	if (directory)
+		closedir(directory);
+	free_matrix(&str);
+	printf("second token is: %s\n", mini->toks[1]);
 }
 
-t_cmds *initialize_cmds()
+char	*get_env_char(char *env, char **envp, int n)
 {
-    t_cmds *cmds = (t_cmds *)malloc(sizeof(t_cmds) * 1);
-    if (cmds == NULL)
-    {
-        exit(EXIT_FAILURE);
-    }
+	int	i;
+	int	j;
 
-    cmds->cmd = (char *)malloc(sizeof(char *) * 1000);
-    cmds->args = (char **)malloc(sizeof(char **) * 1000);
-    cmds->redirect = (t_redirect *)malloc(sizeof(t_redirect));
-    if (cmds->redirect == NULL)
-    {
-        exit(EXIT_FAILURE);
-    }
-    cmds->cmd = NULL;
-    cmds->args = NULL;
-    cmds->redirect->infile = (char *)malloc(sizeof(char *) * 1000);
-    cmds->redirect->outfile = (char *)malloc(sizeof(char *) * 1000);
-    //cmds->redirect->infile = NULL;
-    //cmds->redirect->outfile = NULL;
-    cmds->redirect->redirect_type = 0;
-    cmds->fdi = 0;
-    cmds->fdo = 0;
-    cmds->redirect_count = 0;
-    cmds->next = NULL;
-
-    return cmds;
+	i = 0;
+	if (n < 0)
+		n = ft_strlen(env);
+	while (!ft_strchr(env, '=') && envp && envp[i])
+	{
+		j = n;
+		if (j < ft_strchr_i(envp[i], '='))
+			j = ft_strchr_i(envp[i], '=');
+		if (!ft_strncmp(envp[i], env, j))
+			return (ft_substr(envp[i], j + 1, ft_strlen(envp[i])));
+		i++;
+	}
+	return (NULL);
 }
 
-void free_cmd(t_cmds *cmd)
+void	mini_getpid(t_commands *p)
 {
-    free(cmd->cmd);
-    if (cmd->args)
-    {
-        for (int i = 0; cmd->args[i] != NULL; i++) //norminette for to while
-        {
-            free(cmd->args[i]);
-        }
-        free(cmd->args);
-    }
-    if (cmd->redirect)
-    {
-        free(cmd->redirect->infile);
-        free(cmd->redirect->outfile);
-        free(cmd->redirect);
-    }
-    free(cmd);
+	pid_t	pid;
+
+	pid = fork();
+	if (pid < 0)
+	{
+		mini_perror(FORKERR, NULL, 1);
+		free_matrix(&p->envp);
+		exit(1);
+	}
+	if (!pid)
+	{
+		free_matrix(&p->envp);
+		exit(1);
+	}
+	waitpid(pid, NULL, 0);
+	p->pid = pid - 1;
 }
 
+void	*run_lexer(char *input, t_commands *commands)
+{
+	char	**token;
+	t_mini	*mini;
+
+	if (!input)
+	{
+		printf("exit\n");
+		return (NULL);
+	}
+	if (input[0] != '\0')
+		add_history(input);
+	token = tokenize_commands(input, " ");
+	free(input);
+	if (!token)
+		mini_perror(QUOTE, NULL, 1);
+	if (!token)
+		return ("");
+	commands = parse_input(token, commands);
+	if (commands && commands->cmds)
+		mini = commands->cmds->content;
+	if (commands && commands->cmds && mini && mini->toks \
+		&& ft_lstsize(commands->cmds) == 1)
+		commands->envp = set_env_char("_", \
+		mini->toks[len_matrix(mini->toks) - 1], commands->envp, 1);
+	if (commands && commands->cmds)
+		ft_lstclear(&commands->cmds, free_content);
+	return (commands);
+}
 
 int	main(int argc, char **argv, char **envp)
 {
-    (void)argc;
-    (void)argv;
-	const char	*input;
-	t_mini	*mini = initialize_mini();
-    //t_cmds  *cmd = initialize_cmds();
-	//int		i;
+	char		*input;
+	t_commands	commands;
 
-    //initialize_mini(envp);
-	get_env(envp, mini);
-	while (1)
+	(void)argc;
+	(void)argv;
+	commands = initialize_commands(argv, envp);
+	while (envp != NULL)
 	{
-		input = readline("shell>> ");
-        if (input && input[0])
-        {
-            printf("enters main function\n");
-            add_history(input);
-        }
-        if (input && input[0])
-		{
-            if (run_lexer(input, mini) && parse_input(mini))
-		    {
-                printf("parse and lex successful\n");
-                execute_commands(mini);
-		    }
-        }
-		//free_cmds(&mini, input);
+		signal(SIGINT, handle_sigint);
+		signal(SIGQUIT, SIG_IGN);
+		input = readline("shell>>  ");
+		if (!run_lexer(input, &commands))
+			break ;
 	}
-	return (0);
+	exit(g_status);
 }
-
-

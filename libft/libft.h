@@ -24,13 +24,20 @@ typedef struct s_list
 	struct s_list	*next;
 }	t_list;
 
-typedef struct s_parse
+enum	e_mini_error
 {
-	int				toks; //parser toks
-	int				p_args; //parser args
-	int				red; //count_redirect
-	int				args; //count_args
-}				t_parse;
+	QUOTE = 1,
+	NDIR = 2,
+	NPERM = 3,
+	NCMD = 6,
+	DUPERR = 7,
+	FORKERR = 8,
+	PIPERR = 9,
+	PIPENDERR = 10,
+	MEM = 11,
+	IS_DIR = 12,
+	NOT_DIR = 13
+};
 
 size_t		ft_strlen(const char *str);
 int			ft_atoi(const char *str);
@@ -63,9 +70,10 @@ char		*ft_itoa(int n);
 char		*ft_strmapi(char const *s, char (*f)(unsigned int, char));
 void		ft_putchar_fd(char c, int fd);
 void		ft_striteri(char *s, void (*f)(unsigned int, char*));
-void		ft_putstr_fd(char *s, int fd);
-void		ft_putendl_fd(char *s, int fd);
+int			ft_putstr_fd(char *s, int fd);
+int			ft_putendl_fd(char *s, int fd);
 void		ft_putnbr_fd(int n, int fd);
+int			ft_countchar(char *s, char c);
 t_list		*ft_lstnew(void *content);
 void		ft_lstadd_front(t_list **lst, t_list *new);
 int			ft_lstsize(t_list *lst);
@@ -75,5 +83,9 @@ void		ft_lstdelone(t_list *lst, void (*del)(void*));
 void		ft_lstclear(t_list **lst, void (*del)(void*));
 void		ft_lstiter(t_list *lst, void (*f)(void *));
 t_list		*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
+int			ft_strchr_i(const char *s, int c);
+int			ft_atoi2(const char *str, long *nbr);
+int			ft_isspace(char c);
+int			strchr_mod(const char *s, char *set);
 
 #endif

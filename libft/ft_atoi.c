@@ -36,3 +36,28 @@ int	ft_atoi(const char *str)
 	}
 	return ((int)(res * sign));
 }
+
+int	ft_atoi2(const char *str, long *nbr)
+{
+	int		sign;
+
+	sign = 1;
+	*nbr = 0;
+	while (ft_isspace(*str))
+		str++;
+	if (*str == '-')
+		sign = -sign;
+	if (*str == '-' || *str == '+')
+		str++;
+	if (!ft_isdigit(*str))
+		return (-1);
+	while (ft_isdigit(*str))
+	{
+		*nbr = 10 * *nbr + (*str - '0');
+		str++;
+	}
+	if (*str && !ft_isspace(*str))
+		return (-1);
+	*nbr *= sign;
+	return (0);
+}

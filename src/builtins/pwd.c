@@ -1,27 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_isalpha.c                                       :+:      :+:    :+:   */
+/*   pwd.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: grinella <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: duzegbu <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/16 14:30:38 by grinella          #+#    #+#             */
-/*   Updated: 2023/01/16 18:23:53 by grinella         ###   ########.fr       */
+/*   Created: 2024/01/25 12:00:33 by duzegbu           #+#    #+#             */
+/*   Updated: 2024/01/25 12:00:36 by duzegbu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../../includes/minishell.h"
 
-int	ft_isspace(char c)
+int	ft_pwd(void)
 {
-	return ((c >= 9 && c <= 13) || c == ' ');
-}
+	char	*path;
 
-int	ft_isalpha(int c)
-{
-	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
-	{
-		return (1);
-	}
+	path = getcwd(NULL, 0);
+	ft_putendl_fd(path, 1);
+	free(path);
 	return (0);
 }

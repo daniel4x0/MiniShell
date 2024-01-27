@@ -1,27 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_isalpha.c                                       :+:      :+:    :+:   */
+/*   ft_countchar.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: grinella <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: duzegbu <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/16 14:30:38 by grinella          #+#    #+#             */
-/*   Updated: 2023/01/16 18:23:53 by grinella         ###   ########.fr       */
+/*   Created: 2024/01/25 17:24:59 by duzegbu           #+#    #+#             */
+/*   Updated: 2024/01/25 17:25:06 by duzegbu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int	ft_isspace(char c)
+int	ft_countchar(char *s, char c)
 {
-	return ((c >= 9 && c <= 13) || c == ' ');
-}
+	int	count;
 
-int	ft_isalpha(int c)
-{
-	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+	if (!s)
+		return (0);
+	count = 0;
+	while (*s)
 	{
-		return (1);
+		if (*s == c)
+			count++;
+		s++;
 	}
-	return (0);
+	return (count);
 }
