@@ -24,7 +24,7 @@ int	here_docs(char *newstr, char *str, char *delimeter, char *err)
 		mini_perror(PIPERR, NULL, 1);
 		return (-1);
 	}
-	str = get_here_str(newstr, str, 0, delimeter, err);
+	str = here_string(newstr, str, delimeter, err);
 	write(fd[1], str, ft_strlen(str));
 	free(str);
 	close(fd[1]);

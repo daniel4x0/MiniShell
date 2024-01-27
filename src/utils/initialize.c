@@ -64,7 +64,7 @@ t_commands	initialize_commands(char **argv, char **envp)
 	commands.cmds = NULL;
 	commands.envp = dup_matrix(envp);
 	g_status = 0;
-	mini_getpid(&commands);
+	get_pid(&commands);
 	commands = initialize_env(commands, str, argv);
 	return (commands);
 }

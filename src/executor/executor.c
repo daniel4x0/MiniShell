@@ -24,10 +24,12 @@ void	read_line_and_update(char ***m, int fd)
 	*m = trimmed;
 }
 
-char	*get_here_str(char *newstr, char *str, size_t len, char *max, char *err)
+char	*here_string(char *newstr, char *str, char *max, char *err)
 {
+	size_t len;
 	char	*store;
 
+	len = 0;
 	while (g_status != 130 && (!newstr || ft_strncmp(newstr, max, len) \
 		|| ft_strlen(max) != len))
 	{

@@ -54,7 +54,7 @@ char	*get_env_char(char *env, char **envp, int n)
 	return (NULL);
 }
 
-void	mini_getpid(t_commands *p)
+void	get_pid(t_commands *commands)
 {
 	pid_t	pid;
 
@@ -62,16 +62,16 @@ void	mini_getpid(t_commands *p)
 	if (pid < 0)
 	{
 		mini_perror(FORKERR, NULL, 1);
-		free_matrix(&p->envp);
+		free_matrix(&commands->envp);
 		exit(1);
 	}
 	if (!pid)
 	{
-		free_matrix(&p->envp);
+		free_matrix(&commands->envp);
 		exit(1);
 	}
 	waitpid(pid, NULL, 0);
-	p->pid = pid - 1;
+	commands->pid = pid - 1;
 }
 
 void	*run_lexer(char *input, t_commands *commands)
