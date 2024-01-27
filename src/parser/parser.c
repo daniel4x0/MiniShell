@@ -90,7 +90,6 @@ char	*env_expander(t_commands *commands, char *str, int index)
 
 void	*parse_input(char **args, t_commands *commands)
 {
-	printf("ready to parse\n");
 	int	exit;
 	int	i;
 

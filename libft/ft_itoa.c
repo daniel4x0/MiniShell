@@ -3,56 +3,63 @@
 /*                                                        :::      ::::::::   */
 /*   ft_itoa.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: grinella <grinella@student.42.fr>          +#+  +:+       +#+        */
+/*   By: engirald <engirald@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/30 15:30:37 by grinella          #+#    #+#             */
-/*   Updated: 2023/01/31 10:55:23 by grinella         ###   ########.fr       */
+/*   Created: 2023/02/07 18:23:14 by engirald          #+#    #+#             */
+/*   Updated: 2023/02/07 18:23:15 by engirald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static int	ft_len(int n)
+static char	*ft_char(char *s, unsigned int number, long int len)
+{
+	while (number > 0)
+	{
+		s[len--] = 48 + (number % 10);
+		number = number / 10;
+	}
+	return (s);
+}
+
+static long int	ft_len(int n)
 {
 	int	len;
 
 	len = 0;
-	if (n < 0)
+	if (n <= 0)
+		len = 1;
+	while (n != 0)
 	{
 		len++;
-		n = -n;
-	}
-	while (n > 0)
-	{
 		n = n / 10;
-		len++;
 	}
 	return (len);
 }
 
 char	*ft_itoa(int n)
 {
-	char	*str;
-	int		len;
+	char				*s;
+	long int			len;
+	unsigned int		number;
+	int					sign;
 
+	sign = 1;
 	len = ft_len(n);
-	if (n == -2147483648)
-		return (ft_strdup("-2147483648"));
-	if (n == 0)
-		return (ft_strdup("0"));
-	str = (char *)malloc(sizeof(char) * (len + 1));
-	if (!str)
+	s = (char *)malloc(sizeof(char) * (len + 1));
+	if (!(s))
 		return (NULL);
-	str[len] = '\0';
+	s[len--] = '\0';
+	if (n == 0)
+		s[0] = '0';
 	if (n < 0)
 	{
-		str[0] = '-';
-		n = -n;
+		sign *= -1;
+		number = n * -1;
+		s[0] = '-';
 	}
-	while (n > 0)
-	{
-		str[--len] = n % 10 + '0';
-		n = n / 10;
-	}
-	return (str);
+	else
+		number = n;
+	s = ft_char(s, number, len);
+	return (s);
 }

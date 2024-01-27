@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_substr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: grinella <grinella@student.42.fr>          +#+  +:+       +#+        */
+/*   By: engirald <engirald@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/30 14:29:54 by grinella          #+#    #+#             */
-/*   Updated: 2023/02/02 12:42:03 by grinella         ###   ########.fr       */
+/*   Created: 2023/02/07 18:40:06 by engirald          #+#    #+#             */
+/*   Updated: 2023/02/07 19:52:26 by engirald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,21 @@
 
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
-	char	*str;
-	size_t	i;
+	char	*new;
+	size_t	slen;
+	size_t	finish;
 
 	if (!s)
-		return (NULL);
-	if (len > ft_strlen(s))
-		str = (char *)malloc(sizeof(char) * (ft_strlen(s) + 1));
-	else
-		str = (char *)malloc(sizeof(char) * (len + 1));
-	if (!str)
-		return (NULL);
-	i = 0;
-	while (len > 0 && start <= ft_strlen(s))
-	{
-		str[i] = s[start];
-		i++;
-		start++;
-		len--;
-	}
-	str[i] = '\0';
-	return (str);
+		return (0);
+	slen = ft_strlen(s);
+	finish = 0;
+	if (start < slen)
+		finish = slen - start;
+	if (finish > len)
+		finish = len;
+	new = (char *)malloc(sizeof(char) * (finish + 1));
+	if (!new)
+		return (0);
+	ft_strlcpy(new, s + start, finish + 1);
+	return (new);
 }

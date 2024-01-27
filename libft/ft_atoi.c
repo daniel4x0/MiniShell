@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_atoi.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: grinella <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: engirald <engirald@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/21 10:27:22 by grinella          #+#    #+#             */
-/*   Updated: 2023/01/25 19:03:46 by grinella         ###   ########.fr       */
+/*   Created: 2023/02/07 18:19:21 by engirald          #+#    #+#             */
+/*   Updated: 2024/01/27 18:39:04 by engirald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,29 @@
 
 int	ft_atoi(const char *str)
 {
-	long			res;
-	long			sign;
-	unsigned int	i;
+	int					i;
+	int					sign;
+	unsigned long int	result;
 
-	res = 0;
-	sign = 1;
 	i = 0;
-	while ((str[i] >= 9 && str[i] <= 13) || str[i] == 32)
+	sign = 1;
+	result = 0;
+	while (str[i] == 32 || (str[i] >= 9 && str[i] <= 13))
 		i++;
-	if (str[i] == '-' || str[i] == '+')
+	if (str[i] == '-')
 	{
-		if (str[i] == '-')
-			sign = -1;
+		sign = -1;
 		i++;
 	}
-	while (str[i] >= '0' && str[i] <= '9')
+	else if (str[i] == '+')
+		i++;
+	while (ft_isdigit(str[i]))
 	{
-		res = res * 10 + str[i] - '0';
+		result *= 10;
+		result += str[i] - '0';
 		i++;
 	}
-	return ((int)(res * sign));
+	return (result * sign);
 }
 
 int	ft_atoi2(const char *str, long *nbr)

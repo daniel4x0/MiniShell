@@ -32,7 +32,6 @@ void	cmd_extract(t_commands *commands, t_list *cmd, char **str, char *path)
 	if (directory)
 		closedir(directory);
 	free_matrix(&str);
-	printf("second token is: %s\n", mini->toks[1]);
 }
 
 char	*get_env_char(char *env, char **envp, int n)

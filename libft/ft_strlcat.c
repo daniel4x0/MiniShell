@@ -3,53 +3,36 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strlcat.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: grinella <grinella@student.42.fr>          +#+  +:+       +#+        */
+/*   By: engirald <engirald@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/19 17:06:30 by grinella          #+#    #+#             */
-/*   Updated: 2023/02/02 13:26:41 by grinella         ###   ########.fr       */
+/*   Created: 2023/02/07 18:38:44 by engirald          #+#    #+#             */
+/*   Updated: 2023/02/07 18:38:45 by engirald         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-size_t	ft_strlcat(char *dest, char *src, size_t size)
+size_t	ft_strlcat(char *dst, const char *src, size_t size)
 {
-	size_t	i;
-	size_t	j;
-	char	*str;
+	size_t	s;
+	size_t	d;
+	size_t	di;
+	size_t	si;
 
-	str = (char *)src;
-	if (!dest && !size)
-		return (size);
-	i = ft_strlen(dest);
-	if (i >= size)
-		return (size + ft_strlen(str));
-	j = 0;
-	while (str[j] && i < size - 1)
+	si = ft_strlen(src);
+	if (!dst && size == 0)
+		return (si);
+	d = ft_strlen(dst);
+	di = d;
+	if (size <= di)
+		return (size + si);
+	s = 0;
+	while (src[s] && d + 1 < size)
 	{
-		dest[i] = str[j];
-		i++;
-		j++;
+		dst[d] = src[s];
+		s++;
+		d++;
 	}
-	dest[i] = 0;
-	return (i + ft_strlen(&str[j]));
+	dst[d] = 0;
+	return (di + si);
 }
-
-/*
-
-#include <stdio.h>
-
-int main()
-{
-	static char	dest[15];
-	int	i;
-	i = 0;
-	while(i < 6)
-	{
-		dest[i] = 'r';
-		i++;
-	}
-	dest[11] = 'a';
-	printf("%u,%s,\n", ft_strlcat(dest, "lorem", 15), dest);
-}
-*/
