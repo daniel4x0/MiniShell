@@ -50,7 +50,6 @@ char	**swap_matrix(char ***args, char **swap, int index)
 	return (*args);
 }
 
-
 char	**switch_matrix(t_commands *commands, char **args)
 {
 	char	**swap;

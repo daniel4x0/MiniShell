@@ -18,17 +18,14 @@ char	*handle_env_tilde(char *str, char *tilde, int index)
 {
 	char	*path;
 	char	*result;
+	int		arr[2];
 
-    int     in_quotes_single;
-    int     in_quotes_double;
-	in_quotes_single = 0;
-	in_quotes_double = 0;
-    index = -1;
+	index = -1;
 	while (str && str[++index])
 	{
-		in_quotes_single = (in_quotes_single + (!in_quotes_double && str[index] == '\'')) % 2;
-		in_quotes_double = (in_quotes_double + (!in_quotes_single && str[index] == '\"')) % 2;
-		if (!in_quotes_single && !in_quotes_double && str[index] == '~' && (index == 0 || \
+		arr[SQ] = (arr[SQ] + (!arr[DQ] && str[index] == '\'')) % 2;
+		arr[DQ] = (arr[DQ] + (!arr[SQ] && str[index] == '\"')) % 2;
+		if (!arr[SQ] && !arr[DQ] && str[index] == '~' && (index == 0 || \
 			str[index - 1] != '$'))
 		{
 			result = ft_substr(str, 0, index);
@@ -57,7 +54,8 @@ char	*toks_extract(t_commands *commands, char *str, int i)
 	if (start == -1)
 		start = ft_strlen(str) - 1;
 	result = ft_substr(str, 0, i - 1);
-	env = get_env_char(&str[i], commands->envp, strchr_mod(&str[i], "\"\'$|>< "));
+	env = get_env_char(&str[i], commands->envp, \
+	strchr_mod(&str[i], "\"\'$|>< "));
 	if (!env && str[i] == '$')
 		env = ft_itoa(commands->pid);
 	else if (!env && str[i] == '?')

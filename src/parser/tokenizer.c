@@ -16,27 +16,29 @@ extern int	g_status;
 
 char	**handle_mutable_quotes(char **result, char *str, char *delimeter)
 {
-	int		in_quotes_single = 0;
-	int		in_quotes_double = 0;
-	int		index = 0;
-	int		start = 0;
-	int		flag = 0;
+	int		flag;
+	int		arr[2];
+	int		is[2];
 
-	while (str && str[index] != '\0')
+	flag = 0;
+	while (str && str[is[0]] != '\0')
 	{
-		start = index;
-		if (!ft_strchr(delimeter, str[index]))
+		is[1] = is[0];
+		if (!ft_strchr(delimeter, str[is[0]]))
 		{
-			while ((!ft_strchr(delimeter, str[index]) || in_quotes_single || in_quotes_double) && str[index])
+			while ((!ft_strchr(delimeter, str[is[0]]) \
+			|| arr[SQ] || arr[DQ]) && str[is[0]])
 			{
-				in_quotes_single = (in_quotes_single + (!in_quotes_double && str[index] == '\'')) % 2;
-				in_quotes_double = (in_quotes_double + (!in_quotes_single && str[index] == '\"')) % 2;
-				index++;
+				arr[SQ] = (arr[SQ] + (!arr[DQ] && \
+				str[is[0]] == '\'')) % 2;
+				arr[DQ] = (arr[DQ] + (!arr[SQ] && \
+				str[is[0]] == '\"')) % 2;
+				is[0]++;
 			}
 		}
 		else
-			index++;
-		result[flag++] = ft_substr(str, start, index - start);
+			is[0]++;
+		result[flag++] = ft_substr(str, is[1], is[0] - is[1]);
 	}
 	return (result);
 }
@@ -44,19 +46,21 @@ char	**handle_mutable_quotes(char **result, char *str, char *delimeter)
 char	**handle_quotes(char **result, char const *s, char *set, int i[3])
 {
 	int		len;
-	int in_quotes_single = 0;
-	int in_quotes_double = 0;
+	int		sq;
+	int		dq;
 
+	sq = 0;
+	dq = 0;
 	len = ft_strlen(s);
 	while (s[i[0]])
 	{
 		while (ft_strchr(set, s[i[0]]) && s[i[0]] != '\0')
 			i[0]++;
 		i[1] = i[0];
-		while ((!ft_strchr(set, s[i[0]]) || in_quotes_single || in_quotes_double) && s[i[0]])
+		while ((!ft_strchr(set, s[i[0]]) || sq || dq) && s[i[0]])
 		{
-			in_quotes_single = (in_quotes_single + (!in_quotes_double && s[i[0]] == '\'')) % 2;
-			in_quotes_double = (in_quotes_double + (!in_quotes_single && s[i[0]] == '\"')) % 2;
+			sq = (sq + (!dq && s[i[0]] == '\'')) % 2;
+			dq = (dq + (!sq && s[i[0]] == '\"')) % 2;
 			i[0]++;
 		}
 		if (i[1] >= len)
@@ -71,7 +75,7 @@ char	**tokenize_mutable_commands(char const *str, char *delimeter)
 {
 	char	**result;
 	int		word_count;
-	
+
 	if (!str)
 		return (NULL);
 	word_count = open_mutable_quotes_flag((char *)str, delimeter);

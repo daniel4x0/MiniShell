@@ -29,18 +29,6 @@ void	free_matrix(char ***m)
 	}
 }
 
-/*void	free_matrix_d(char **m)
-{
-	int	i;
-
-	i = -1;
-	while (m[++i])
-	{
-		free(m[i]);
-	}
-	free(m);
-}*/
-
 char	**dup_matrix(char **m)
 {
 	char	**out;

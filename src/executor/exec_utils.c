@@ -10,40 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "../../includes/minishell.h"
 
 extern int	g_status;
-
-void	ft_lstadd_back(t_list **lst, t_list *new)
-{
-	t_list	*tmp;
-
-	if (!lst || !new)
-		return ;
-	if (!*lst)
-	{
-		*lst = new;
-		return ;
-	}
-	tmp = *lst;
-	while (tmp->next)
-		tmp = tmp->next;
-	tmp->next = new;
-}
-
-t_list	*ft_lstnew(void *content)
-{
-	t_list	*new;
-
-	new = (t_list *)malloc(sizeof(t_list));
-	if (new == NULL)
-		return (NULL);
-	new->content = content;
-	new->next = NULL;
-	return (new);
-}
-
 
 t_list	*ft_lstlast(t_list *lst)
 {

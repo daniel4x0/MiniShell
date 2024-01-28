@@ -31,9 +31,9 @@ CFLAGS			= -Wall -Wextra -Werror -I.
 
 NAME			= libft.a
 
-all:			$(NAME)
+all:			$(NAME) $(BONUS_OBJS)
 
-$(NAME):		$(OBJS)
+$(NAME):		$(OBJS) $(BONUS_OBJS)
 				ar rcs $(NAME) $(OBJS)
 
 clean:

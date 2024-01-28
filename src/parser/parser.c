@@ -1,55 +1,25 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parser.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: duzegbu <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/01/28 17:27:47 by duzegbu           #+#    #+#             */
+/*   Updated: 2024/01/28 17:27:49 by duzegbu          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
 extern int	g_status;
 
-void	ft_lstdelone(t_list *lst, void (*del)(void *))
-{
-	if (!lst || !del)
-		return ;
-	del(lst->content);
-	free(lst);
-}
-
-void	ft_lstclear(t_list **lst, void (*del)(void *))
-{
-	t_list	*tmp;
-
-	if (!lst || !del)
-		return ;
-	while (*lst)
-	{
-		tmp = (*lst)->next;
-		ft_lstdelone(*lst, del);
-		*lst = tmp;
-	}
-}
-
-int	ft_lstsize(t_list *lst)
-{
-	int		count;
-	t_list	*current;
-
-	count = 0;
-	current = lst;
-	if (current)
-		count++;
-	else
-		return (0);
-	while (current->next != 0)
-	{
-		count++;
-		current = current->next;
-	}
-	return (count);
-}
-
-char	*full_trim(char const *str, int in_quotes_single, int in_quotes_double)
+char	*full_trim(char const *str, int sq, int dq)
 {
 	char	*result;
 	int		count;
-	int		res; //index for trimmed string
-	int		i;  //index for input string
+	int		res;
+	int		i;
 
 	res = -1;
 	i = 0;
@@ -61,9 +31,9 @@ char	*full_trim(char const *str, int in_quotes_single, int in_quotes_double)
 		return (NULL);
 	while (str[i])
 	{
-		in_quotes_single = (in_quotes_single + (!in_quotes_double && str[i] == '\'')) % 2;
-		in_quotes_double = (in_quotes_double + (!in_quotes_single && str[i] == '\"')) % 2;
-		if ((str[i] != '\"' || in_quotes_single) && (str[i] != '\'' || in_quotes_double) \
+		sq = (sq + (!dq && str[i] == '\'')) % 2;
+		dq = (dq + (!sq && str[i] == '\"')) % 2;
+		if ((str[i] != '\"' || sq) && (str[i] != '\'' || dq) \
 			&& ++res >= 0)
 			result[res] = str[i];
 		i++;
@@ -74,16 +44,20 @@ char	*full_trim(char const *str, int in_quotes_single, int in_quotes_double)
 
 char	*env_expander(t_commands *commands, char *str, int index)
 {
-	int	in_quote_single = 0;
-	int	in_quote_double = 0;
+	int	sq;
+	int	dq;
+
+	sq = 0;
+	dq = 0;
 	while (str && str[++index])
 	{
-		in_quote_single = (in_quote_single + (!in_quote_double && str[index] == '\'')) % 2;
-		in_quote_double = (in_quote_double + (!in_quote_single && str[index] == '\"')) % 2;
-		if (!in_quote_single && str[index] == '$' && str[index + 1] && \
-			((strchr_mod(&str[index + 1], "/~%^{}:; ") && !in_quote_double) || \
-			(strchr_mod(&str[index + 1], "/~%^{}:;\"") && in_quote_double)))
-			return (env_expander(commands, toks_extract(commands, str, ++index), -1));
+		sq = (sq + (!dq && str[index] == '\'')) % 2;
+		dq = (dq + (!sq && str[index] == '\"')) % 2;
+		if (!sq && str[index] == '$' && str[index + 1] && \
+			((strchr_mod(&str[index + 1], "/~%^{}:; ") && !dq) || \
+			(strchr_mod(&str[index + 1], "/~%^{}:;\"") && dq)))
+			return (env_expander(commands, \
+			toks_extract(commands, str, ++index), -1));
 	}
 	return (str);
 }
@@ -112,5 +86,3 @@ void	*parse_input(char **args, t_commands *commands)
 	}
 	return (commands);
 }
-
-

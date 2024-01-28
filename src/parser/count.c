@@ -16,7 +16,7 @@ int	amount_of_space(char const *str)
 {
 	int	count;
 	int	i;
-    int arr[2];
+	int	arr[2];
 
 	i = 0;
 	count = 0;
@@ -35,35 +35,33 @@ int	amount_of_space(char const *str)
 	return (count);
 }
 
-int open_mutable_quotes_flag(char *str, char *delimiter)
+int	open_mutable_quotes_flag(char *str, char *delimiter)
 {
-    int word_count;
-    int index;
-    int arr[2];
+	int	word_count;
+	int	index;
+	int	arr[2];
 
-    arr[SQ]     = 0;
-    arr[DQ]     = 0;
-    word_count  = 0;
-    index       = 0;
-    while (str && str[index] != '\0')
-    {
-        word_count++;
-        if (!ft_strchr(delimiter, str[index]))
-        {
-            while ((!ft_strchr(delimiter, str[index]) || arr[SQ] || arr[DQ]) && str[index] != '\0')
-            {
-                arr[SQ] = (arr[SQ] + (!arr[DQ] && str[index] == '\'')) % 2;
-                arr[DQ] = (arr[DQ] + (!arr[SQ] && str[index] == '\"')) % 2;
-                index++;
-            }
-
-        if (arr[SQ] || arr[DQ])
-            return (-1);
-        }
-        else
-        index++;
-    }
-    return (word_count);
+	word_count = 0;
+	index = 0;
+	while (str && str[index] != '\0')
+	{
+		word_count++;
+		if (!ft_strchr(delimiter, str[index]))
+		{
+			while ((!ft_strchr(delimiter, str[index]) \
+			|| arr[SQ] || arr[DQ]) && str[index] != '\0')
+			{
+				arr[SQ] = (arr[SQ] + (!arr[DQ] && str[index] == '\'')) % 2;
+				arr[DQ] = (arr[DQ] + (!arr[SQ] && str[index] == '\"')) % 2;
+				index++;
+			}
+			if (arr[SQ] || arr[DQ])
+				return (-1);
+		}
+		else
+			index++;
+	}
+	return (word_count);
 }
 
 int	open_quotes_flag(const char *s, char *c, int i[2])

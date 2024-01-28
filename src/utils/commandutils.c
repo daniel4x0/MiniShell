@@ -40,7 +40,7 @@ char	*find_cmd(char **env_path, char *cmd, char *full_path)
 	return (full_path);
 }
 
-DIR	 *check_cmd(t_commands *commands, t_list *cmd, char ***s, char *path)
+DIR	*check_cmd(t_commands *commands, t_list *cmd, char ***s, char *path)
 {
 	t_mini	*mini;
 	DIR		*directory;

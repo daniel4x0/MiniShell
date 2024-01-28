@@ -34,6 +34,7 @@ SRCS = 		minishell.c \
 			src/signals/signal.c \
 			src/utils/matrixops.c \
 			src/utils/matrixops2.c \
+			src/utils/lstutils.c \
 			src/utils/commandutils.c \
 			src/utils/initialize.c
 
