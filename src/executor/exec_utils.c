@@ -10,40 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "../../includes/minishell.h"
 
 extern int	g_status;
-
-void	ft_lstadd_back(t_list **lst, t_list *new)
-{
-	t_list	*tmp;
-
-	if (!lst || !new)
-		return ;
-	if (!*lst)
-	{
-		*lst = new;
-		return ;
-	}
-	tmp = *lst;
-	while (tmp->next)
-		tmp = tmp->next;
-	tmp->next = new;
-}
-
-t_list	*ft_lstnew(void *content)
-{
-	t_list	*new;
-
-	new = (t_list *)malloc(sizeof(t_list));
-	if (new == NULL)
-		return (NULL);
-	new->content = content;
-	new->next = NULL;
-	return (new);
-}
-
 
 t_list	*ft_lstlast(t_list *lst)
 {
@@ -114,11 +83,10 @@ int	get_fd(char *full_path, int oldfd, int read_or_write, int write)
 t_list	*node_refil(char **args, int i)
 {
 	t_list	*cmds[2];
-	char	**store1;
-	char	**store2;
+	char	**store_1_2[2];
 
 	cmds[0] = NULL;
-	store2 = trim_dump(args);
+	store_1_2[1] = trim_dump(args);
 	while (args[++i])
 	{
 		cmds[1] = ft_lstlast(cmds[0]);
@@ -128,15 +96,15 @@ t_list	*node_refil(char **args, int i)
 			ft_lstadd_back(&cmds[0], ft_lstnew(initialize_mini()));
 			cmds[1] = ft_lstlast(cmds[0]);
 		}
-		store1 = args;
+		store_1_2[0] = args;
 		cmds[1]->content = handle_pipe_redir \
-		(cmds[1]->content, store1, store2, &i);
+		(cmds[1]->content, store_1_2[0], store_1_2[1], &i);
 		if (i < 0)
-			return (end_fill(cmds[0], args, store2));
+			return (end_fill(cmds[0], args, store_1_2[1]));
 		if (!args[i])
 			break ;
 	}
-	free_matrix(&store2);
+	free_matrix(&store_1_2[1]);
 	free_matrix(&args);
 	return (cmds[0]);
 }

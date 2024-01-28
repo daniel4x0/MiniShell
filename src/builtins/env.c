@@ -14,31 +14,29 @@
 
 char	**set_env_char(char *var, char *value, char **envp, int n)
 {
-	int		index;
-	int		max_index;
-	char	*env_var;
-	char	*env_var_value;
+	int		index[2];
+	char	*ev_evv[2];
 
 	if (n < 0)
 		n = ft_strlen(var);
-	index = -1;
-	env_var = ft_strjoin(var, "=");
-	env_var_value = ft_strjoin(env_var, value);
-	free(env_var);
-	while (!ft_strchr(var, '=') && envp && envp[++index])
+	index[0] = -1;
+	ev_evv[0] = ft_strjoin(var, "=");
+	ev_evv[1] = ft_strjoin(ev_evv[0], value);
+	free(ev_evv[0]);
+	while (!ft_strchr(var, '=') && envp && envp[++index[0]])
 	{
-		max_index = n;
-		if (max_index < ft_strchr_i(envp[index], '='))
-			max_index = ft_strchr_i(envp[index], '=');
-		if (!ft_strncmp(envp[index], var, max_index))
+		index[1] = n;
+		if (index[1] < ft_strchr_i(envp[index[0]], '='))
+			index[1] = ft_strchr_i(envp[index[0]], '=');
+		if (!ft_strncmp(envp[index[0]], var, index[1]))
 		{
-			env_var = envp[index];
-			envp[index] = env_var_value;
-			free(env_var);
+			ev_evv[0] = envp[index[0]];
+			envp[index[0]] = ev_evv[1];
+			free(ev_evv[0]);
 			return (envp);
 		}
 	}
-	envp = extend_matrix(envp, env_var_value);
-	free(env_var_value);
+	envp = extend_matrix(envp, ev_evv[1]);
+	free(ev_evv[1]);
 	return (envp);
 }
