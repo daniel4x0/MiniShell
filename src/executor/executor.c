@@ -24,34 +24,6 @@ void	read_line_and_update(char ***m, int fd)
 	*m = trimmed;
 }
 
-/*char	*here_string(char *newstr, char *str, char *max, char *err)
-{
-	size_t len;
-	char	*store;
-
-	len = 0;
-	while (g_status != 130 && (!newstr || ft_strncmp(newstr, max, len) \
-		|| ft_strlen(max) != len))
-	{
-		store = str;
-		str = ft_strjoin(str, newstr);
-		free(store);
-		free(newstr);
-		newstr = readline("> ");
-		if (!newstr)
-		{
-			printf("%s (wanted `%s\')\n", err, max);
-			break ;
-		}
-		store = newstr;
-		newstr = ft_strjoin(newstr, "\n");
-		free(store);
-		len = ft_strlen(newstr) - 1;
-	}
-	free(newstr);
-	return (str);
-}*/
-
 char	*here_string(char *str[2], size_t len, char *limit, char *warn)
 {
 	char	*temp;

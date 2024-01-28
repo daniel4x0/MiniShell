@@ -22,15 +22,14 @@ void	free_matrix(char ***m)
 		free(m[0][i]);
 		i++;
 	}
-	if (m && m[0])
+	if (m)
 	{
 		free(m[0]);
 		*m = NULL;
 	}
 }
 
-
-void	free_matrix_d(char **m)
+/*void	free_matrix_d(char **m)
 {
 	int	i;
 
@@ -40,7 +39,7 @@ void	free_matrix_d(char **m)
 		free(m[i]);
 	}
 	free(m);
-}
+}*/
 
 char	**dup_matrix(char **m)
 {

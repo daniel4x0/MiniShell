@@ -65,7 +65,7 @@ char	**switch_matrix(t_commands *commands, char **args)
 		swap = tokenize_mutable_commands(args[index], "<|>");
 		swap_matrix(&args, swap, index);
 		index += len_matrix(swap) - 1;
-		free_matrix_d(swap);
+		free_matrix(&swap);
 	}
 	return (args);
 }

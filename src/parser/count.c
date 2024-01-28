@@ -66,7 +66,7 @@ int open_mutable_quotes_flag(char *str, char *delimiter)
     return (word_count);
 }
 
-int open_quotes_flag(const char *command, char *delimeter)
+/*int open_quotes_flag(const char *command, char *delimeter)
 {
     int token_start = 0;
     int word_count = 0;
@@ -93,4 +93,32 @@ int open_quotes_flag(const char *command, char *delimeter)
             token_start++;
     }
     return word_count;
+}*/
+
+int	open_quotes_flag(const char *s, char *c, int i[2])
+{
+	int		q[2];
+
+	q[0] = 0;
+	q[1] = 0;
+	while (s[i[0]] != '\0')
+	{
+		if (!ft_strchr(c, s[i[0]]))
+		{
+			i[1]++;
+			while ((!ft_strchr(c, s[i[0]]) || q[0]) && s[i[0]] != '\0')
+			{
+				if (!q[1] && (s[i[0]] == '\"' || s[i[0]] == '\''))
+					q[1] = s[i[0]];
+				q[0] = (q[0] + (s[i[0]] == q[1])) % 2;
+				q[1] *= q[0] != 0;
+				i[0]++;
+			}
+			if (q[0])
+				return (-1);
+		}
+		else
+			i[0]++;
+	}
+	return (i[1]);
 }

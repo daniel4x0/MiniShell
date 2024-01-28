@@ -74,7 +74,7 @@ void	free_content(void *content)
 	t_mini	*mini;
 
 	mini = content;
-	free_matrix_d(mini->toks);
+	free_matrix(&mini->toks);
 	free(mini->env);
 	if (mini->fdin != STDIN_FILENO)
 		close(mini->fdin);
@@ -86,7 +86,7 @@ void	free_content(void *content)
 t_list	*end_fill(t_list *cmds, char **args, char **store)
 {
 	ft_lstclear(&cmds, free_content);
-	free_matrix_d(store);
-	free_matrix_d(args);
+	free_matrix(&store);
+	free_matrix(&args);
 	return (NULL);
 }

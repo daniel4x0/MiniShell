@@ -41,37 +41,30 @@ char	**handle_mutable_quotes(char **result, char *str, char *delimeter)
 	return (result);
 }
 
-char	**handle_quotes(char **result, const char *str, char *delimeter)
+char	**handle_quotes(char **result, char const *s, char *set, int i[3])
 {
-	int index = 0;
-	int start = 0;
+	int		len;
 	int in_quotes_single = 0;
 	int in_quotes_double = 0;
-	int s_len = ft_strlen(str);
-	int word_index = 0;
 
-	while (str[index])
+	len = ft_strlen(s);
+	while (s[i[0]])
 	{
-		while (ft_strchr(delimeter, str[index]) && str[index] != '\0')
-			index++;
-
-		start = index;
-
-		while ((!ft_strchr(delimeter, str[index]) || in_quotes_single || in_quotes_double) && str[index])
+		while (ft_strchr(set, s[i[0]]) && s[i[0]] != '\0')
+			i[0]++;
+		i[1] = i[0];
+		while ((!ft_strchr(set, s[i[0]]) || in_quotes_single || in_quotes_double) && s[i[0]])
 		{
-			in_quotes_single = (in_quotes_single + (!in_quotes_double && str[index] == '\'')) % 2;
-			in_quotes_double = (in_quotes_double + (!in_quotes_single && str[index] == '\"')) % 2;
-			index++;
+			in_quotes_single = (in_quotes_single + (!in_quotes_double && s[i[0]] == '\'')) % 2;
+			in_quotes_double = (in_quotes_double + (!in_quotes_single && s[i[0]] == '\"')) % 2;
+			i[0]++;
 		}
-
-		if (start >= s_len)
-			result[word_index++] = "\0";
+		if (i[1] >= len)
+			result[i[2]++] = "\0";
 		else
-			result[word_index++] = ft_substr(str, start, index - start);
+			result[i[2]++] = ft_substr(s, i[1], i[0] - i[1]);
 	}
-
-	result[word_index] = NULL;
-	return result;
+	return (result);
 }
 
 char	**tokenize_mutable_commands(char const *str, char *delimeter)
@@ -96,15 +89,23 @@ char	**tokenize_commands(char const *str, char *delimeter)
 {
 	char	**result;
 	int		word_count;
+	int		i[3];
+	int		counts[2];
+
+	i[0] = 0;
+	i[1] = 0;
+	i[2] = 0;
+	counts[0] = 0;
+	counts[1] = 0;
 	if (!str)
 		return (NULL);
-	word_count = open_quotes_flag(str, delimeter);
+	word_count = open_quotes_flag(str, delimeter, counts);
 	if (word_count == -1)
 		return (NULL);
 	result = malloc((word_count + 1) * sizeof(char *));
 	if (result == NULL)
 		return (NULL);
-	result = handle_quotes(result, str, delimeter);
+	result = handle_quotes(result, str, delimeter, i);
 	result[word_count] = NULL;
 	return (result);
 }

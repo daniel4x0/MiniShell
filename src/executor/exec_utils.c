@@ -123,7 +123,7 @@ t_list	*node_refil(char **args, int i)
 		if (!args[i])
 			break ;
 	}
-	free_matrix_d(store2);
-	free_matrix_d(args);
+	free_matrix(&store2);
+	free_matrix(&args);
 	return (cmds[0]);
 }
