@@ -116,14 +116,14 @@ t_list	*node_refil(char **args, int i)
 			cmds[1] = ft_lstlast(cmds[0]);
 		}
 		store1 = args;
-		cmds[1]->content = handle_pipe_redir(cmds[1]->content, store1, store2, &i);
+		cmds[1]->content = handle_pipe_redir \
+		(cmds[1]->content, store1, store2, &i);
 		if (i < 0)
 			return (end_fill(cmds[0], args, store2));
 		if (!args[i])
 			break ;
 	}
-	free_matrix(&store2);
-	free_matrix(&args);
+	free_matrix_d(store2);
+	free_matrix_d(args);
 	return (cmds[0]);
 }
-

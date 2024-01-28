@@ -42,4 +42,3 @@ void	*mini_perror(int err_type, char *param, int err)
 	ft_putendl_fd(param, 2);
 	return (NULL);
 }
-

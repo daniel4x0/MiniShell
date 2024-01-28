@@ -12,10 +12,9 @@
 
 #include "../../includes/minishell.h"
 
-int	ft_exit(t_list *cmd, int *exit)
+int	ft_exit(t_list *cmd, int *exit, long i)
 {
 	t_mini	*mini;
-	long	i;
 	long	j;
 
 	mini = cmd->content;

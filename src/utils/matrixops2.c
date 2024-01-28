@@ -22,11 +22,24 @@ void	free_matrix(char ***m)
 		free(m[0][i]);
 		i++;
 	}
-	if (m)
+	if (m && m[0])
 	{
 		free(m[0]);
 		*m = NULL;
 	}
+}
+
+
+void	free_matrix_d(char **m)
+{
+	int	i;
+
+	i = -1;
+	while (m[++i])
+	{
+		free(m[i]);
+	}
+	free(m);
 }
 
 char	**dup_matrix(char **m)

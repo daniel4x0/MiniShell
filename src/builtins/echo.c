@@ -12,19 +12,18 @@
 
 #include "../../includes/minishell.h"
 
-int	ft_echo(t_list *cmd)
+int	ft_echo(t_list *cmd, int flag)
 {
-    char	**argv;
-    t_mini	*node;
+	char	**argv;
+	t_mini	*mini;
 	int		newline;
 	int		index;
-    int     flag;
-	
+
 	index = 0;
 	flag = 0;
 	newline = 1;
-	node = cmd->content;
-	argv = node->toks;
+	mini = cmd->content;
+	argv = mini->toks;
 	while (argv && argv[++index])
 	{
 		if (!flag && !ft_strncmp(argv[index], "-n", 2) && \

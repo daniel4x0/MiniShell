@@ -42,6 +42,3 @@ char	**set_env_char(char *var, char *value, char **envp, int n)
 	free(env_var_value);
 	return (envp);
 }
-
-
-

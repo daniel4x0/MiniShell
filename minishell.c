@@ -31,7 +31,7 @@ void	cmd_extract(t_commands *commands, t_list *cmd, char **str, char *path)
 		mini_perror(NPERM, mini->env, 126);
 	if (directory)
 		closedir(directory);
-	free_matrix(&str);
+	free_matrix_d(str);
 }
 
 char	*get_env_char(char *env, char **envp, int n)
@@ -62,12 +62,12 @@ void	get_pid(t_commands *commands)
 	if (pid < 0)
 	{
 		mini_perror(FORKERR, NULL, 1);
-		free_matrix(&commands->envp);
+		free_matrix_d(commands->envp);
 		exit(1);
 	}
 	if (!pid)
 	{
-		free_matrix(&commands->envp);
+		free_matrix_d(commands->envp);
 		exit(1);
 	}
 	waitpid(pid, NULL, 0);

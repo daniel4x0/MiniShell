@@ -12,7 +12,7 @@
 
 #include "../../includes/minishell.h"
 
-extern int g_status;
+extern int	g_status;
 
 t_mini	*fd_out_a(t_mini *mini, char **args, int *i)
 {
@@ -107,7 +107,7 @@ t_mini	*fd_in_b(t_mini *mini, char **args, int *i)
 	if (args[++(*i)])
 	{
 		s[0] = args[*i];
-		mini->fdin = here_docs(str[0], str[1], s[0], s[1]);
+		mini->fdin = here_docs(str, s);
 	}
 	if (!args[*i] || mini->fdin == -1)
 	{

@@ -12,9 +12,10 @@
 
 #include "../../includes/minishell.h"
 
-extern int g_status;
+extern int	g_status;
 
-void	execute_builtins(t_commands *commands, t_mini *mini, t_list *cmd, int len)
+void	execute_builtins(t_commands *commands, t_mini *mini, \
+		t_list *cmd, int len)
 {
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
@@ -22,9 +23,11 @@ void	execute_builtins(t_commands *commands, t_mini *mini, t_list *cmd, int len)
 		execve(mini->env, mini->toks, commands->envp);
 	else if (mini->toks && !ft_strncmp(*mini->toks, "pwd", len) && len == 3)
 		g_status = ft_pwd();
-	else if (is_builtin(mini) && mini->toks && !ft_strncmp(*mini->toks, "echo", len) && len == 4)
-		g_status = ft_echo(cmd);
-	else if (is_builtin(mini) && mini->toks && !ft_strncmp(*mini->toks, "env", len) && len == 3)
+	else if (is_builtin(mini) && mini->toks && \
+		!ft_strncmp(*mini->toks, "echo", len) && len == 4)
+		g_status = ft_echo(cmd, 0);
+	else if (is_builtin(mini) && mini->toks && \
+		!ft_strncmp(*mini->toks, "env", len) && len == 3)
 	{
 		fd_putmatrix(commands->envp, 1, 1);
 		g_status = 0;

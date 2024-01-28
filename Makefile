@@ -4,7 +4,7 @@ LIBFT_A			=	libft.a
 LIBFT_DIR		=	libft/
 LIBFT			=	$(addprefix $(LIBFT_DIR), $(LIBFT_A))
 
-CC				=	gcc
+CC				=	gcc -g
 INCLUDE			=	includes
 CFLAGS			=	-Wall -Wextra -Werror -I$(INCLUDE)
 RM				=	rm -f

@@ -1,6 +1,6 @@
 #include "../../includes/minishell.h"
 
-extern int g_status;
+extern int	g_status;
 
 void	read_line_and_update(char ***m, int fd)
 {
@@ -24,7 +24,7 @@ void	read_line_and_update(char ***m, int fd)
 	*m = trimmed;
 }
 
-char	*here_string(char *newstr, char *str, char *max, char *err)
+/*char	*here_string(char *newstr, char *str, char *max, char *err)
 {
 	size_t len;
 	char	*store;
@@ -50,6 +50,32 @@ char	*here_string(char *newstr, char *str, char *max, char *err)
 	}
 	free(newstr);
 	return (str);
+}*/
+
+char	*here_string(char *str[2], size_t len, char *limit, char *warn)
+{
+	char	*temp;
+
+	while (g_status != 130 && (!str[0] || ft_strncmp(str[0], limit, len) \
+		|| ft_strlen(limit) != len))
+	{
+		temp = str[1];
+		str[1] = ft_strjoin(str[1], str[0]);
+		free(temp);
+		free(str[0]);
+		str[0] = readline("> ");
+		if (!str[0])
+		{
+			printf("%s (wanted `%s\')\n", warn, limit);
+			break ;
+		}
+		temp = str[0];
+		str[0] = ft_strjoin(str[0], "\n");
+		free(temp);
+		len = ft_strlen(str[0]) - 1;
+	}
+	free(str[0]);
+	return (str[1]);
 }
 
 void	*execute_commands(t_commands *commands, t_list *cmd)

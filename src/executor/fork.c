@@ -12,7 +12,7 @@
 
 #include "../../includes/minishell.h"
 
-extern int g_status;
+extern int	g_status;
 
 void	execute_fork(t_commands *commands, t_list *cmd, int fd[2])
 {
@@ -42,7 +42,8 @@ void	*check_to_fork(t_commands *commands, t_list *cmd, int fd[2])
 		return (NULL);
 	if ((mini->env && access(mini->env, X_OK) == 0) || is_builtin(mini))
 		execute_fork(commands, cmd, fd);
-	else if (!is_builtin(mini) && ((mini->env && !access(mini->env, F_OK)) || directory))
+	else if (!is_builtin(mini) && \
+		((mini->env && !access(mini->env, F_OK)) || directory))
 		g_status = 126;
 	else if (!is_builtin(mini) && mini->toks)
 		g_status = 127;

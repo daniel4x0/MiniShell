@@ -25,7 +25,7 @@ int	builtin(t_commands *commands, t_list *cmd, int *is_exit, int n)
 		if (a)
 			n = ft_strlen(*a);
 		if (a && !ft_strncmp(*a, "exit", n) && n == 4)
-			g_status = ft_exit(cmd, is_exit);
+			g_status = ft_exit(cmd, is_exit, 0);
 		else if (!cmd->next && a && !ft_strncmp(*a, "cd", n) && n == 2)
 			g_status = ft_cd(commands);
 		else if (!cmd->next && a && !ft_strncmp(*a, "export", n) && n == 6)
@@ -69,5 +69,3 @@ int	is_builtin(t_mini *n)
 		return (1);
 	return (0);
 }
-
-

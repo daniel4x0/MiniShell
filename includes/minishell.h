@@ -65,7 +65,7 @@ void		cd_error(char **mx1, char **mx2);
 int			ft_cd(t_commands *commands);
 
 //echo.c
-int			ft_echo(t_list *cmd);
+int			ft_echo(t_list *cmd, int flag);
 
 //env.c
 char		**set_env_char(char *var, char *value, char **envp, int n);
@@ -74,10 +74,10 @@ char		**set_env_char(char *var, char *value, char **envp, int n);
 void		*mini_perror(int err_type, char *param, int err);
 
 //exit.c
-int			ft_exit(t_list *cmd, int *is_exit);
+int			ft_exit(t_list *cmd, int *is_exit, long i);
 
 //export.c
-int			check_equalsign(char *argv, char **envp, int index);
+int			check_equalsign(char *argv, char **envp, int index[2]);
 int			ft_export(t_commands *commands);
 
 //pwd.c
@@ -99,8 +99,9 @@ t_list		*node_refil(char **args, int i);
 
 //executor.c
 void		read_line_and_update(char ***m, int fd);
-char		*here_string(char *newstr, char *str, \
-			char *max, char *err);
+/*char		*here_string(char *newstr, char *str, \
+			char *max, char *err);*/
+			char	*here_string(char *str[2], size_t len, char *limit, char *warn);
 void		*execute_commands(t_commands *commands, t_list *cmd);
 
 //filedescriptors.c
@@ -114,8 +115,8 @@ void		execute_fork(t_commands *commands, t_list *cmd, int fd[2]);
 void		*check_to_fork(t_commands *commands, t_list *cmd, int fd[2]);
 
 //heredocument.c
-int			here_docs(char *newstr, char *str, char *delimeter, char *err);
-
+//int			here_docs(char *newstr, char *str, char *delimeter, char *err);
+int	here_docs(char *str[2], char *aux[2]);
 //count.c
 int			amount_of_space(char const *str);
 int			open_mutable_quotes_flag(char *str, char *delimiter);
@@ -162,6 +163,7 @@ char		**switch_matrix(t_commands *commands, char **args);
 
 //matrixops2.c
 void		free_matrix(char ***m);
+void		free_matrix_d(char **m);
 char		**dup_matrix(char **m);
 int			fd_putmatrix(char **m, int nl, int fd);
 char		**extend_matrix(char **str, char *newstr);

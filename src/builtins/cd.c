@@ -40,9 +40,9 @@ void	cd_error(char **mx1, char **mx2)
 
 int	ft_cd(t_commands *commands)
 {
-    char    **mx1;  //store command
-    char    **mx2;  //store additional command
 	char	*env;
+	char	**mx1;
+	char	**mx2;
 
 	g_status = 0;
 	mx1 = ((t_mini *)commands->cmds->content)->toks;
