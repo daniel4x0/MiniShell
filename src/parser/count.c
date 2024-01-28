@@ -16,61 +16,53 @@ int	amount_of_space(char const *str)
 {
 	int	count;
 	int	i;
-	int	in_quotes_double;
-	int	in_quotes_single;
-    //int arr[2];
+    int arr[2];
 
 	i = 0;
 	count = 0;
-	in_quotes_double = 0;
-	in_quotes_single = 0;
+	arr[DQ] = 0;
+	arr[SQ] = 0;
 	while (str && str[i])
 	{
-		in_quotes_single = (in_quotes_single + \
-        (!in_quotes_double && str[i] == '\'')) % 2;
-		in_quotes_double = (in_quotes_double + \
-        (!in_quotes_single && str[i] == '\"')) % 2;
-		if ((str[i] == '\"' && !in_quotes_single) \
-        || (str[i] == '\'' && !in_quotes_double))
+		arr[SQ] = (arr[SQ] + (!arr[DQ] && str[i] == '\'')) % 2;
+		arr[DQ] = (arr[DQ] + (!arr[SQ] && str[i] == '\"')) % 2;
+		if ((str[i] == '\"' && !arr[SQ]) || (str[i] == '\'' && !arr[DQ]))
 			count++;
 		i++;
 	}
-	if (in_quotes_single || in_quotes_double)
+	if (arr[SQ] || arr[DQ])
 		return (-1);
 	return (count);
 }
 
 int open_mutable_quotes_flag(char *str, char *delimiter)
 {
-    int in_single_quote;
-    int in_double_quote;
     int word_count;
     int index;
+    int arr[2];
 
-    in_single_quote = 0;
-    in_double_quote = 0;
-    word_count = 0;
-    index = 0;
+    arr[SQ]     = 0;
+    arr[DQ]     = 0;
+    word_count  = 0;
+    index       = 0;
     while (str && str[index] != '\0')
     {
         word_count++;
-
         if (!ft_strchr(delimiter, str[index]))
         {
-            while ((!ft_strchr(delimiter, str[index]) || in_single_quote || in_double_quote) && str[index] != '\0')
+            while ((!ft_strchr(delimiter, str[index]) || arr[SQ] || arr[DQ]) && str[index] != '\0')
             {
-                in_single_quote = (in_single_quote + (!in_double_quote && str[index] == '\'')) % 2;
-                in_double_quote = (in_double_quote + (!in_single_quote && str[index] == '\"')) % 2;
+                arr[SQ] = (arr[SQ] + (!arr[DQ] && str[index] == '\'')) % 2;
+                arr[DQ] = (arr[DQ] + (!arr[SQ] && str[index] == '\"')) % 2;
                 index++;
             }
 
-            if (in_single_quote || in_double_quote)
-                return (-1);
+        if (arr[SQ] || arr[DQ])
+            return (-1);
         }
         else
-            index++;
+        index++;
     }
-
     return (word_count);
 }
 

@@ -74,7 +74,7 @@ void	get_pid(t_commands *commands)
 	commands->pid = pid - 1;
 }
 
-void	*run_lexer(char *input, t_commands *commands)
+void	*run_lexer(char *input, t_commands *c)
 {
 	char	**token;
 	t_mini	*mini;
@@ -92,16 +92,15 @@ void	*run_lexer(char *input, t_commands *commands)
 		mini_perror(QUOTE, NULL, 1);
 	if (!token)
 		return ("");
-	commands = parse_input(token, commands);
-	if (commands && commands->cmds)
-		mini = commands->cmds->content;
-	if (commands && commands->cmds && mini && mini->toks \
-		&& ft_lstsize(commands->cmds) == 1)
-		commands->envp = set_env_char("_", \
-		mini->toks[len_matrix(mini->toks) - 1], commands->envp, 1);
-	if (commands && commands->cmds)
-		ft_lstclear(&commands->cmds, free_content);
-	return (commands);
+	c = parse_input(token, c);
+	if (c && c->cmds)
+		mini = c->cmds->content;
+	if (c && c->cmds && mini && mini->toks && ft_lstsize(c->cmds) == 1)
+		c->envp = set_env_char("_", \
+		mini->toks[len_matrix(mini->toks) - 1], c->envp, 1);
+	if (c && c->cmds)
+		ft_lstclear(&c->cmds, free_content);
+	return (c);
 }
 
 int	main(int argc, char **argv, char **envp)
