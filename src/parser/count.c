@@ -37,33 +37,31 @@ int	amount_of_space(char const *str)
 
 int	open_mutable_quotes_flag(char *str, char *delimiter)
 {
-	int	word_count;
-	int	index;
+	int	wc_i[2];
 	int	arr[2];
 
-	arr[SQ] = 0;
-	arr[DQ] = 0;
-	word_count = 0;
-	index = 0;
-	while (str && str[index] != '\0')
+	arr[0] = 0;
+	arr[1] = 0;
+	wc_i[0] = 0;
+	wc_i[1] = 0;
+	while (str && str[wc_i[1]] != '\0' && wc_i[0]++)
 	{
-		word_count++;
-		if (!ft_strchr(delimiter, str[index]))
+		if (!ft_strchr(delimiter, str[wc_i[1]]))
 		{
-			while ((!ft_strchr(delimiter, str[index]) \
-			|| arr[SQ] || arr[DQ]) && str[index] != '\0')
+			while ((!ft_strchr(delimiter, str[wc_i[1]]) \
+			|| arr[SQ] || arr[DQ]) && str[wc_i[1]] != '\0')
 			{
-				arr[SQ] = (arr[SQ] + (!arr[DQ] && str[index] == '\'')) % 2;
-				arr[DQ] = (arr[DQ] + (!arr[SQ] && str[index] == '\"')) % 2;
-				index++;
+				arr[SQ] = (arr[SQ] + (!arr[DQ] && str[wc_i[1]] == '\'')) % 2;
+				arr[DQ] = (arr[DQ] + (!arr[SQ] && str[wc_i[1]] == '\"')) % 2;
+				wc_i[1]++;
 			}
 			if (arr[SQ] || arr[DQ])
 				return (-1);
 		}
 		else
-			index++;
+			wc_i[1]++;
 	}
-	return (word_count);
+	return (wc_i[0]);
 }
 
 int	open_quotes_flag(const char *s, char *c, int i[2])
