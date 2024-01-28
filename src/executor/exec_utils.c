@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_utils.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: duzegbu <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/01/28 15:38:07 by duzegbu           #+#    #+#             */
+/*   Updated: 2024/01/28 15:38:09 by duzegbu          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 
 #include "../../includes/minishell.h"
 
@@ -85,7 +97,8 @@ int	get_fd(char *full_path, int oldfd, int read_or_write, int write)
 		mini_perror(NDIR, full_path, 127);
 	else if (!read_or_write && access(full_path, R_OK) == -1)
 		mini_perror(NPERM, full_path, 126);
-	else if (read_or_write && access(full_path, W_OK) == -1 && access(full_path, F_OK) == 0)
+	else if (read_or_write && access(full_path, W_OK) \
+			== -1 && access(full_path, F_OK) == 0)
 		mini_perror(NPERM, full_path, 126);
 	if (read_or_write && write)
 		fd = open(full_path, O_CREAT | O_WRONLY | O_APPEND, 0666);

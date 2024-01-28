@@ -31,6 +31,9 @@
 # include <fcntl.h>
 # include <sys/ioctl.h>
 
+# define SQ 0 //single quotes
+# define DQ 1 //double quotes
+
 typedef struct s_commands
 {
 	t_list	*cmds;
@@ -99,7 +102,8 @@ t_list		*node_refil(char **args, int i);
 
 //executor.c
 void		read_line_and_update(char ***m, int fd);
-			char	*here_string(char *str[2], size_t len, char *limit, char *warn);
+char		*here_string(char *str[2], size_t len, \
+			char *limit, char *warn);
 void		*execute_commands(t_commands *commands, t_list *cmd);
 
 //filedescriptors.c
